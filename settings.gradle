@@ -7,5 +7,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "WorkIndia-RapidWebView-SDK"
-include ':app'
 include ':RapidWebView'
