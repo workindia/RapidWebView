@@ -23,8 +23,10 @@ RapidWebView is a library for your Android application which allows you to load 
 - WebView request interceptor - intercepts requests made by webview and serves assets from local copy reducing the website "Time to interactive" time. 
 - Javascript interface - a generic collection of javascript interface functions which can be used to interactive with native application
 
-### Performance
-TODO: Add performance metrics
+### Performance    
+We enabled webview content debugging (`setWebContentsDebuggingEnabled(true)`) and used Lighthouse from Chrome DevTools to measure performance of
+the pages loaded with and without RapidWebView SDK. The results can be seen below. A 67.2% improvement in TTI!   
+![metrics](/images/Performance.png)
 
 ### Technologies used
 
