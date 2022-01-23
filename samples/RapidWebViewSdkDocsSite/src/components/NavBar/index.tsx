@@ -157,7 +157,7 @@ const NAV_ITEMS: Array<NavItem> = [
   },
   {
     label: "Documentation",
-    href: "/docs",
+    href: "/docs/arch",
   },
   {
     label: "Examples",
