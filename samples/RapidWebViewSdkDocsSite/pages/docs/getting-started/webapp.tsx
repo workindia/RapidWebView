@@ -36,7 +36,7 @@ const GettingStartedWebapp: NextPage = () => {
             </Heading>
 
             <Text fontSize={"md"} color={"gray.600"} mb={"3"}>
-              This guide explains how you can setup a webapp to be used along
+              This guide explains how you can set up a webapp to be used along
               with RapidWebView SDK.
             </Text>
             <Text fontSize={"md"} color={"gray.600"} mb={"3"}>
@@ -46,8 +46,8 @@ const GettingStartedWebapp: NextPage = () => {
               </Link>
               , a Javascript bundler. Webpack analyses all modules in your app,
               creates a dependency graph, compiles them together in an optimized
-              manner in one or more bundle files which your{" "}
-              <Code>index.html</Code> can reference. By utlising a feature
+              way in one or more bundle files which your{" "}
+              <Code>index.html</Code> can reference. By utilising a feature
               called code-splitting, webpack splits your code into smaller
               chunks which can be loaded on demand or in parallel.
             </Text>
@@ -63,7 +63,7 @@ const GettingStartedWebapp: NextPage = () => {
               Images, Fonts, etc.).
             </Text>
             <Text fontSize={"md"} color={"gray.600"} mb={"6"}>
-              At it&apos;s core, RapidWebView SDK reads this manifest and caches
+              At its core, RapidWebView SDK reads this manifest and caches
               in Android local directory so that it can be referenced later by
               the Webview interceptor.
             </Text>
