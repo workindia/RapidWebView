@@ -13,6 +13,6 @@ class WebViewActivity : AppCompatActivity() {
         val rapidWebViewClient = RapidWebViewClient()
         rapidWebView.webViewClient = rapidWebViewClient
         WebView.setWebContentsDebuggingEnabled(true)
-        rapidWebView.loadUrl("https://rapid-app-demo.vercel.app/")
+        rapidWebView.loadUrl("https://rapid-web-view.netlify.app/")
     }
 }

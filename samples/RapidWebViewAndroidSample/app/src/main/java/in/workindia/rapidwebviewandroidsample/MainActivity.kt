@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         RapidAssetCacheDownloader.initialise(
-            "https://rapid-app-demo.vercel.app/_next/static/assets-manifest.json"
+            "https://rapid-web-view.netlify.app/_next/static/assets-manifest.json"
         )
         navigationButton.setOnClickListener {
             val intent = Intent(this, WebViewActivity::class.java)
