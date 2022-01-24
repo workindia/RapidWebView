@@ -22,6 +22,8 @@ const Architecture: NextPage = () => {
             <Heading fontSize={"xl"} mb={"4"}>
               Understanding the architecture
             </Heading>
+
+            TODO
           </SidebarLayout>
         </main>
       </Container>

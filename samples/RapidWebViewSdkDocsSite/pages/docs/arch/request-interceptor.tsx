@@ -22,6 +22,8 @@ const RequestInterceptor: NextPage = () => {
             <Heading fontSize={"xl"} mb={"4"}>
               The Request Interceptor
             </Heading>
+
+            TODO
           </SidebarLayout>
         </main>
       </Container>

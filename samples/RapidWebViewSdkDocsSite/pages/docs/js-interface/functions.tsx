@@ -22,6 +22,8 @@ const JSInterfaceFunctions: NextPage = () => {
             <Heading fontSize={"xl"} mb={"4"}>
               Javascript Interface functions
             </Heading>
+
+            TODO
           </SidebarLayout>
         </main>
       </Container>

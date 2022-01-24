@@ -1,17 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 
-import { Code, Container, Heading, Text, Link } from "@chakra-ui/react";
+import { Container, Heading, Text, Link } from "@chakra-ui/react";
 
 import NavBar from "@components/NavBar";
 import Footer from "@components/Footer";
 import SidebarLayout from "@components/SidebarLayout";
 
-const AssetDownloader: NextPage = () => {
+const JSDemo: NextPage = () => {
   return (
     <>
       <Head>
-      <title>RapidWebView - Understanding the architecture (Asset Downloader)</title>
+        <title>RapidWebView - JS Interface Demo</title>
       </Head>
 
       <Container maxW={"container.lg"}>
@@ -19,10 +19,6 @@ const AssetDownloader: NextPage = () => {
 
         <main>
           <SidebarLayout>
-            <Heading fontSize={"xl"} mb={"4"}>
-              The asset downloader
-            </Heading>
-
             TODO
           </SidebarLayout>
         </main>
@@ -32,4 +28,4 @@ const AssetDownloader: NextPage = () => {
   );
 };
 
-export default AssetDownloader;
+export default JSDemo;
