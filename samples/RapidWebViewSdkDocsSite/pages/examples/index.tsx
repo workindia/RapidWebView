@@ -26,7 +26,7 @@ const Examples: NextPage = () => {
               </Text>
               <Button
                 as="a"
-                href="https://appsenjoy.com/DrWdn"
+                href="https://appsenjoy.com/r2c3F"
                 target={"_blank"}
                 colorScheme={"green"}
                 mr="3"
