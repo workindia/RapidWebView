@@ -82,7 +82,7 @@ class RapidAssetCacheDownloader {
             })
         }
 
-        private fun beginCachingTask(assetList: ArrayList<String>, version: Int) {
+        private fun beginCachingTask(assetList: ArrayList<String>, version: String) {
             RapidAssetCacheClient.onAssetsDownloadTaskInitiated(assetList)
 
             val timer = Timer()
