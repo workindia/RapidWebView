@@ -47,7 +47,7 @@ class RapidAssetCacheClient {
          * @param version: Version of assets downloaded
          */
         @JvmStatic
-        fun onAssetsDownloadTaskCompleted(version: Int) {
+        fun onAssetsDownloadTaskCompleted(version: String) {
             RapidAssetCacheObject.setAssetDownloadStatus(STATUS_SUCCESS)
             RapidAssetCacheObject.setAssetVersion(version)
         }
@@ -167,7 +167,7 @@ class RapidAssetCacheClient {
          * @param networkVersion: version of new asset-manifest that is fetched
          */
         @JvmStatic
-        fun compareAssetVersion(networkVersion: Int): Boolean {
+        fun compareAssetVersion(networkVersion: String): Boolean {
             return networkVersion == RapidAssetCacheObject.getAssetVersion()
         }
 

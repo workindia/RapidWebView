@@ -174,7 +174,7 @@ class RapidStorageUtility {
              * @return the int value of current asset version
              */
             @JvmStatic
-            fun get(): Int {
+            fun get(): String {
                 val file = getCacheFileInstance(CACHE_VERSION_FILE_NAME)
                 val versionValue = StringBuilder()
                 try {
@@ -186,9 +186,9 @@ class RapidStorageUtility {
                     }
                     br.close()
                 } catch (e: IOException) {
-                    return -1
+                    return "-1"
                 }
-                return Integer.parseInt(versionValue.toString().trim())
+                return versionValue.toString().trim()
             }
 
             /**
@@ -196,10 +196,10 @@ class RapidStorageUtility {
              * @param version int value of asset version
              */
             @JvmStatic
-            fun set(version: Int) {
+            fun set(version: String) {
                 writeToAppCache(
                     CACHE_VERSION_FILE_NAME,
-                    version.toString().toResponseBody(null)
+                    version.toResponseBody(null)
                 )
             }
         }

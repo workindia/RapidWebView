@@ -82,14 +82,14 @@ class RapidAssetCacheDownloader {
             })
         }
 
-        private fun beginCachingTask(assetList: ArrayList<String>, version: Int) {
+        private fun beginCachingTask(assetList: ArrayList<String>, version: String) {
             RapidAssetCacheClient.onAssetsDownloadTaskInitiated(assetList)
 
             val timer = Timer()
             val timerTask: TimerTask = object : TimerTask() {
                 override fun run() {
                     if (!RapidAssetCacheClient.isAssetDownloadTaskCompleted()) {
-                        RapidAssetCacheClient.getPendingAssetToBeCached(assetList).forEach { url ->
+                        RapidAssetCacheClient.getPendingAssetToBeCached(assetList).iterator().forEach { url ->
                             // TODO: Add checksum check
                             DownloadTask(url).queueFileDownload()
                         }
