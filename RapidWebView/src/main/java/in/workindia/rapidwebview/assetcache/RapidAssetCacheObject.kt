@@ -11,7 +11,7 @@ object RapidAssetCacheObject {
     /**
      * assetVersion stores current version of assets stored in cache
      */
-    private var assetVersion: Int = -1
+    private var assetVersion: String = "-1"
 
     /**
      * Stores whether assets are currently being downloaded
@@ -23,7 +23,7 @@ object RapidAssetCacheObject {
      * setAssetVersion - Set asset-version
      * @param version current local cache version
      */
-    fun setAssetVersion(version: Int) {
+    fun setAssetVersion(version: String) {
         assetVersion = version
         RapidStorageUtility.AssetVersion.set(assetVersion)
     }
@@ -32,7 +32,7 @@ object RapidAssetCacheObject {
      * getAssetVersion - Get current local cache version
      * @return version
      */
-    fun getAssetVersion(): Int {
+    fun getAssetVersion(): String {
         return RapidStorageUtility.AssetVersion.get()
     }
 
