@@ -6,7 +6,6 @@ import {
   Container,
   Box,
   Heading,
-  Text,
   Stack,
   Button,
   Code,
@@ -27,6 +26,7 @@ const demoItems = [
     description: "vibrate(durationMs: long)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.vibrate(200);
     },
   },
@@ -36,6 +36,7 @@ const demoItems = [
     description: "showToast(text: string, duration: int)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.showToast("Hello World", 0);
     },
   },
@@ -45,6 +46,7 @@ const demoItems = [
     description: "copyToClipboard(text: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.copyToClipboard("Test message copied");
     },
   },
@@ -54,7 +56,13 @@ const demoItems = [
     description: "getInstalledAppList()",
     link: "#",
     onClick: () => {
-      console.log(app.getInstalledAppList());
+      const toast = createStandaloneToast();
+      toast({
+        title: "Installed App List",
+        // @ts-ignore
+        description: app.getInstalledAppList(),
+        isClosable: true,
+      });
     },
   },
   {
@@ -63,6 +71,7 @@ const demoItems = [
     description: "startActivity(destActivity: string, intentParams: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.startActivity(
         "in.workindia.rapidwebviewandroidsample.MainActivity",
         "{}"
@@ -75,6 +84,7 @@ const demoItems = [
     description: "openBrowserActivity(url: string, packageName: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.openBrowserActivity(
         "https://github.com/workindia/RapidWebView",
         "com.android.chrome"
@@ -87,6 +97,7 @@ const demoItems = [
     description: "openCustomBrowserTab(url: string, color: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.openCustomBrowserTab(
         "https://github.com/workindia/RapidWebView",
         "#48BB78"
@@ -99,6 +110,7 @@ const demoItems = [
     description: "openDialer(phoneNumber: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.openDialer("+1234567890");
     },
   },
@@ -108,6 +120,7 @@ const demoItems = [
     description: "openExternalIntent(packageName: string, uri: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.openExternalIntent(
         "com.google.android.apps.maps",
         "google.streetview:cbll=46.414382,10.013988"
@@ -120,6 +133,7 @@ const demoItems = [
     description: "openShareIntent(text: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.openShareIntent(
         "Try RapidWebView SDK: https://github.com/workindia/RapidWebView"
       );
@@ -131,6 +145,7 @@ const demoItems = [
     description: "shareToApp(packageName: string, shareText: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.shareToApp(
         "com.Slack",
         "Checkout this SDK: https://github.com/workindia/RapidWebView"
@@ -145,6 +160,7 @@ const demoItems = [
     onClick: () => {
       const toast = createStandaloneToast();
       toast({
+        // @ts-ignore
         title: `Permission status: ${app.checkForPermission([
           "android.permission.CALL_PHONE",
         ])}`,
@@ -160,6 +176,7 @@ const demoItems = [
       "requestPermissions(permissions: Array<string>, rationaleText: string, callback: string?)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.requestPermissions(
         ["android.permission.CALL_PHONE"],
         "Permission required",
@@ -174,6 +191,7 @@ const demoItems = [
       "showNotification(title: string, contentText: string, summaryText: string?, notificationIcon: string, notificationImage: string, destActivity: string)",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.showNotification(
         "Test Notification",
         "Test Content",
@@ -190,19 +208,22 @@ const demoItems = [
     description: "closeActivity()",
     link: "#",
     onClick: () => {
+      // @ts-ignore
       app.closeActivity();
     },
   },
 ];
 
-{/*
+{
+  /*
 Pending examples:
 - openShareIntent(shareText: String, shareImage: String)
 - shareToApp(packageName: String, shareText: String, shareImage: String)
 - uploadFile(fileType: String, uploadUrl: String, callback: String?)
 - storeInAppCache(fileUrl: String)
 - checkForFileInCache(fileUrl: String)
-*/}
+*/
+}
 
 const DemoItem = (props: {
   title: string;
@@ -272,6 +293,7 @@ const JSDemo: NextPage = () => {
               RapidWebView JS Interface Demo
             </Heading>
 
+            {/* @ts-ignore */}
             {typeof app !== "object" ? (
               <Alert status="warning" mb={"6"}>
                 <AlertIcon />
