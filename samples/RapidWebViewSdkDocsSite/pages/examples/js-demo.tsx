@@ -26,7 +26,7 @@ const demoItems = [
     id: 1,
     title: "Vibrate",
     description: "vibrate(durationMs: long)",
-    link: "#",
+    link: "/docs/js-interface/functions#1",
     onClick: () => {
       // @ts-ignore
       app.vibrate(200);
@@ -36,7 +36,7 @@ const demoItems = [
     id: 2,
     title: "Toast",
     description: "showToast(text: string, duration: int)",
-    link: "#",
+    link: "/docs/js-interface/functions#2",
     onClick: () => {
       // @ts-ignore
       app.showToast("Hello World", 0);
