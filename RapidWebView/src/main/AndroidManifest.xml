@@ -10,7 +10,7 @@
 
         <provider
             android:name=".RapidWebViewFileProvider"
-            android:authorities="$PACKAGE_NAMErapidwebview.provider"
+            android:authorities="${applicationId}"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
