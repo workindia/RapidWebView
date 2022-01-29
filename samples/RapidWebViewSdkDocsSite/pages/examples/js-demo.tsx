@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -14,6 +15,7 @@ import {
   Alert,
   AlertIcon,
   createStandaloneToast,
+  useToast,
 } from "@chakra-ui/react";
 
 import NavBar from "@components/NavBar";
@@ -267,7 +269,7 @@ const DemoItem = (props: {
             "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
           }
           onClick={() => {
-            props.onClick();
+            jsCompatible() && props.onClick();
           }}
         >
           Try me!
@@ -277,7 +279,30 @@ const DemoItem = (props: {
   );
 };
 
+const jsCompatible = (): boolean => {
+  // @ts-ignore
+  return typeof app === "object";
+};
+
 const JSDemo: NextPage = () => {
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!jsCompatible()) {
+      const id = "incompatible";
+      if (!toast.isActive(id)) {
+        toast({
+          id,
+          title: "The demo only works on the sample app",
+          position: "top",
+          status: "error",
+          isClosable: false,
+          duration: null,
+        });
+      }
+    }
+  });
+
   return (
     <>
       <Head>
@@ -292,19 +317,6 @@ const JSDemo: NextPage = () => {
             <Heading textAlign={"center"} size={"md"} mb={"6"}>
               RapidWebView JS Interface Demo
             </Heading>
-
-            {/* @ts-ignore */}
-            {typeof app !== "object" ? (
-              <Alert status="warning" mb={"6"}>
-                <AlertIcon />
-                The demo only works on the sample app
-                <Link href="/examples" passHref>
-                  <Button fontSize={"sm"} colorScheme={"green"}>
-                    Download
-                  </Button>
-                </Link>
-              </Alert>
-            ) : null}
 
             <SimpleGrid columns={1} spacingY={"3"}>
               {demoItems.map((item) => (
