@@ -167,6 +167,12 @@ const GettingStarted: NextPage = () => {
                   'import in.workindia.rapidwebview.RapidWebViewJSInterface;\n\n...\nmWebView.addJavascriptInterface(\n\tnew RapidWebViewJSInterface(this, this, mWebView), "app"\n);'
                 }
               </Code>
+              You can read more about the Js Interface functions{" "}
+              <NLink href={"/docs/js-interface/functions"} passHref>
+                <Link color={"blue.600"} textDecor={"underline"}>
+                  here
+                </Link>
+              </NLink>
             </Text>
 
             <Text fontSize={"lg"} mt={"6"} mb={"4"}>
