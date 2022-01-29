@@ -55,7 +55,7 @@ export default function Features() {
           and used Lighthouse from Chrome DevTools to measure performance of the
           pages loaded with and without RapidWebView SDK. The results can be
           seen below.{" "}
-          <Text color={"green.400"} display={"inline-flex"}>
+          <Text as="span" color={"green.400"}>
             A 67.2% improvement in TTI!
           </Text>
         </Text>
