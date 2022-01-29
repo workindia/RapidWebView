@@ -289,7 +289,7 @@ const JSDemo: NextPage = () => {
 
   useEffect(() => {
     setJsInterfaceState(jsCompatible());
-  });
+  }, []);
 
   return (
     <>
