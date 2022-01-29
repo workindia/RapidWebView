@@ -178,7 +178,7 @@ class RapidWebViewJSInterface(
      * @return List of pacakge name of installed app
      */
     @JavascriptInterface
-    fun getInstalledAppList(): ArrayList<String> {
+    fun getInstalledAppList(): String {
         val packageInfo = context
             .packageManager
             .getInstalledApplications(PackageManager.GET_META_DATA)
@@ -187,8 +187,7 @@ class RapidWebViewJSInterface(
         for (i in 0 until packageInfo.size) {
             packages.add(packageInfo[i].packageName)
         }
-
-        return packages
+        return packages.toString()
     }
 
     /**
