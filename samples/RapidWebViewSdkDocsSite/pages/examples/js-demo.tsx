@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -12,10 +12,10 @@ import {
   Code,
   SimpleGrid,
   useColorModeValue,
-  Alert,
-  AlertIcon,
+  Text,
   createStandaloneToast,
   useToast,
+  Flex,
 } from "@chakra-ui/react";
 
 import NavBar from "@components/NavBar";
@@ -285,22 +285,10 @@ const jsCompatible = (): boolean => {
 };
 
 const JSDemo: NextPage = () => {
-  const toast = useToast();
+  const [jsInterfaceState, setJsInterfaceState] = useState(false);
 
   useEffect(() => {
-    if (!jsCompatible()) {
-      const id = "incompatible";
-      if (!toast.isActive(id)) {
-        toast({
-          id,
-          title: "The demo only works on the sample app",
-          position: "top",
-          status: "error",
-          isClosable: false,
-          duration: null,
-        });
-      }
-    }
+    setJsInterfaceState(jsCompatible());
   });
 
   return (
@@ -317,6 +305,30 @@ const JSDemo: NextPage = () => {
             <Heading textAlign={"center"} size={"md"} mb={"6"}>
               RapidWebView JS Interface Demo
             </Heading>
+
+            {!jsInterfaceState ? (
+              <Flex
+                alignItems={"center"}
+                backgroundColor={"red.500"}
+                px={"3"}
+                py={"2"}
+                mb={"6"}
+                borderRadius={"lg"}
+              >
+                <Box flex={1}>
+                  <Text color={"white"} fontWeight={"bold"}>
+                    The demo only works on the sample app
+                  </Text>
+                </Box>
+                <Link href={"/examples"} passHref>
+                  <Button colorScheme={"green"} size={"sm"}>
+                    Download
+                  </Button>
+                </Link>
+              </Flex>
+            ) : (
+              <Box></Box>
+            )}
 
             <SimpleGrid columns={1} spacingY={"3"}>
               {demoItems.map((item) => (
