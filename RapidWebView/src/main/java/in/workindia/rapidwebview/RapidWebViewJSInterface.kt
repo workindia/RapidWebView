@@ -18,6 +18,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.text.TextUtils
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
@@ -187,7 +188,7 @@ class RapidWebViewJSInterface(
         for (i in 0 until packageInfo.size) {
             packages.add(packageInfo[i].packageName)
         }
-        return packages.toString()
+        return TextUtils.join(", ", packages);
     }
 
     /**
