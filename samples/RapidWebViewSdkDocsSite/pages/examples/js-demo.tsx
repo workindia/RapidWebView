@@ -62,7 +62,7 @@ const demoItems = [
       toast({
         title: "Installed App List",
         // @ts-ignore
-        description: app.getInstalledAppList(),
+        description: `Found ${app.getInstalledAppList().split(",").length} app installed on the device.`,
         isClosable: true,
       });
     },
