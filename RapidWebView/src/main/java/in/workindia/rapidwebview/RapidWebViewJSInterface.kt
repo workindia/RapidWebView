@@ -192,6 +192,7 @@ class RapidWebViewJSInterface(
 
     /**
      * Vibrate device
+     * @param durationMs: vibrate duration in milliseconds
      */
     @JavascriptInterface
     fun vibrate(durationMs: Long = 500) {
