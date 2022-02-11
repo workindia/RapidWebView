@@ -18,6 +18,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.text.TextUtils
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
@@ -178,7 +179,7 @@ class RapidWebViewJSInterface(
      * @return List of pacakge name of installed app
      */
     @JavascriptInterface
-    fun getInstalledAppList(): ArrayList<String> {
+    fun getInstalledAppList(): String {
         val packageInfo = context
             .packageManager
             .getInstalledApplications(PackageManager.GET_META_DATA)
@@ -187,12 +188,12 @@ class RapidWebViewJSInterface(
         for (i in 0 until packageInfo.size) {
             packages.add(packageInfo[i].packageName)
         }
-
-        return packages
+        return TextUtils.join(", ", packages);
     }
 
     /**
      * Vibrate device
+     * @param durationMs: vibrate duration in milliseconds
      */
     @JavascriptInterface
     fun vibrate(durationMs: Long = 500) {
