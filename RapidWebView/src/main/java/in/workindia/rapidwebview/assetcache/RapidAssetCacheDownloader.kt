@@ -119,7 +119,6 @@ class RapidAssetCacheDownloader {
         }
     }
 
-}
 
     /**
      * This interface is called when asset manifest json file is fetched and processed
@@ -179,5 +178,4 @@ class RapidAssetCacheDownloader {
             })
         }
     }
-
 }
