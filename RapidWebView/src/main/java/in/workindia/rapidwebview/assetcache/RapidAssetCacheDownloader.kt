@@ -91,7 +91,7 @@ class RapidAssetCacheDownloader {
             RapidAssetCacheClient.onAssetsDownloadTaskInitiated(assetList)
 
             downloadJob = GlobalScope.launch {
-                repeat(failureRepetition) {
+                repeat(10) {
                     if (isActive) {
                         if (it > failureRepetition) {
                             this.cancel()
