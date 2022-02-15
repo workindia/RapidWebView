@@ -100,9 +100,11 @@ const GettingStarted: NextPage = () => {
               >
                 Read more about the manifest here
               </Link>
-              ). Asset cache initialisation needs to be done soon after the
-              application opens, before the webview is loaded. The operation
-              does not run on UI thread and will not impact the users
+              ). The downloader also accepts retry-count as second parameter which  
+              will be used to determine how many times the downloader will retry 
+              in case of an error. Asset cache initialisation needs to be done 
+              soon after the application opens, before the webview is loaded. 
+              The operation does not run on UI thread and will not impact the users
               experience.
               <Code
                 display={"block"}
@@ -113,7 +115,7 @@ const GettingStarted: NextPage = () => {
                 style={{ tabSize: 2 }}
               >
                 {
-                  'import in.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader;\n\n...\nRapidAssetCacheDownloader.initialise(\n\t"https://rapid-web-view.netlify.app/_next/static/assets-manifest.json"\n);'
+                  'import in.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader;\n\n...\nRapidAssetCacheDownloader.initialise(\n\t"https://rapid-web-view.netlify.app/_next/static/assets-manifest.json"\n\t,5\n);'
                 }
               </Code>
             </Text>
