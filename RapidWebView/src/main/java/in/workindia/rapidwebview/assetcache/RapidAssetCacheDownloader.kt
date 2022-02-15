@@ -24,6 +24,7 @@ class RapidAssetCacheDownloader {
         /**
          * Begin the process of caching assets defined by asset provided by `url` param
          * @param url: Url pointing to asset-manifest.json file
+         * @param failureRepetition: determine how many times the downloader will retry in case of an error
          */
         @JvmStatic
         fun initialise(url: String, failureRepetition: Int) {
