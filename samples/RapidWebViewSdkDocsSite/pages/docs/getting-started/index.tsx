@@ -115,7 +115,7 @@ const GettingStarted: NextPage = () => {
                 style={{ tabSize: 2 }}
               >
                 {
-                  'import in.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader;\n\n...\nRapidAssetCacheDownloader.initialise(\n\t"https://rapid-web-view.netlify.app/_next/static/assets-manifest.json"\n\t,5\n);'
+                  'import in.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader;\n\n...\nRapidAssetCacheDownloader.initialise(\n\t"https://rapid-web-view.netlify.app/_next/static/assets-manifest.json",\n\t5\n);'
                 }
               </Code>
             </Text>
