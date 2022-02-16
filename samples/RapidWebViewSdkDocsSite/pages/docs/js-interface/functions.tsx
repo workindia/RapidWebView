@@ -87,6 +87,10 @@ const JSInterfaceFunctions: NextPage = () => {
               {FUNCTION_DOCS.map((item) => (
                 <FunctionDocItem key={item.id} {...item} />
               ))}
+
+              <Text>
+                {"// TODO: Rest of the functions will be documented soon."}
+              </Text>
             </Box>
           </SidebarLayout>
         </main>

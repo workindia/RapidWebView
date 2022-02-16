@@ -17,9 +17,6 @@ export default function Hero() {
         An Android library which utilises <br />
         local caching to offer <br />
         near native experience over WebView.
-        {/* <Text as={"span"} color={"green.400"}>
-        your audience
-      </Text> */}
       </Heading>
       <Text color={"gray.500"}>
         RapidWebView is a library for your Android application which allows you
@@ -47,7 +44,7 @@ export default function Hero() {
             Get Started
           </Button>
         </Link>
-        <Link href={"/docs"} passHref>
+        <Link href={"/docs/arch"} passHref>
           <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
             Learn more
           </Button>
