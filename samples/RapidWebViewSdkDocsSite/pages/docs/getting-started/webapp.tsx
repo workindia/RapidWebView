@@ -46,10 +46,10 @@ const GettingStartedWebapp: NextPage = () => {
               </Link>
               , a Javascript bundler. Webpack analyses all modules in your app,
               creates a dependency graph, compiles them together in an optimized
-              way in one or more bundle files which your{" "}
-              <Code>index.html</Code> can reference. By utilising a feature
-              called code-splitting, webpack splits your code into smaller
-              chunks which can be loaded on demand or in parallel.
+              way in one or more bundle files which your <Code>index.html</Code>{" "}
+              can reference. By utilising a feature called code-splitting,
+              webpack splits your code into smaller chunks which can be loaded
+              on demand or in parallel.
             </Text>
             <Text fontSize={"md"} color={"gray.600"} mb={"3"}>
               In the process of building an app using webpack, we generate a{" "}
@@ -63,9 +63,9 @@ const GettingStartedWebapp: NextPage = () => {
               Images, Fonts, etc.).
             </Text>
             <Text fontSize={"md"} color={"gray.600"} mb={"6"}>
-              At its core, RapidWebView SDK reads this manifest and caches
-              in Android local directory so that it can be referenced later by
-              the Webview interceptor.
+              At its core, RapidWebView SDK reads this manifest and caches in
+              Android local directory so that it can be referenced later by the
+              Webview interceptor.
             </Text>
 
             <Text fontSize={"md"} mb={"3"}>
@@ -181,12 +181,24 @@ const GettingStartedWebapp: NextPage = () => {
               allows us to format the manifest json in required format.
             </Text>
 
-            <Text fontSize={"md"}>
+            <Text fontSize={"md"} mb={"3"}>
               Running <Code>npm run build</Code> generates the final app bundle
               and corresponding manifest which is then deployed on a server. If
               you followed the guide above, the asset manifest should be
               accessible by the SDK at{" "}
               <Code>domain/_next/static/assets-manifest.json</Code>
+            </Text>
+
+            <Text>
+              Sample NextJS App with webpack configuration:{" "}
+              <Link
+                href="https://github.com/workindia/RapidWebView/tree/master/samples/RapidWebViewSdkDocsSite"
+                color={"blue.600"}
+                textDecor={"underline"}
+                isExternal
+              >
+                Github
+              </Link>
             </Text>
 
             <Divider mt={"6"} />
