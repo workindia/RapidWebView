@@ -1,16 +1,15 @@
 package `in`.workindia.rapidwebview.assetcache
 
-import `in`.workindia.rapidwebview.RapidClient
+import `in`.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader.Companion.TAG
 import `in`.workindia.rapidwebview.datamodels.AssetManifest
 import `in`.workindia.rapidwebview.network.RetrofitHelper
 import android.util.Log
 import com.google.gson.Gson
+import kotlinx.coroutines.*
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * RapidAssetCacheDownloader - This utility caches the assets provided by asset-manifest on
@@ -19,20 +18,23 @@ import kotlin.collections.ArrayList
 class RapidAssetCacheDownloader {
 
     companion object {
+        private lateinit var downloadJob: Job
         const val TAG = "RapidAssetCacheDownload"
 
         /**
          * Begin the process of caching assets defined by asset provided by `url` param
          * @param url: Url pointing to asset-manifest.json file
+         * @param failureRepetition: determine how many times the downloader will retry in case of an error
          */
         @JvmStatic
-        fun initialise(url: String) {
+        fun initialise(url: String, failureRepetition: Int) {
             fetchAssetManifest(url, object : AssetManifestDownloadCallback {
                 override fun callback(assetManifest: AssetManifest) {
                     if (!RapidAssetCacheClient.compareAssetVersion(assetManifest.version)) {
                         beginCachingTask(
                             assetManifest.assetUrls.toCollection(ArrayList()),
-                            assetManifest.version
+                            assetManifest.version,
+                            failureRepetition
                         )
                     } else {
                         Log.d(TAG, "RapidAssetCacheDownloader :: Latest Assets found on disk")
@@ -82,27 +84,42 @@ class RapidAssetCacheDownloader {
             })
         }
 
-        private fun beginCachingTask(assetList: ArrayList<String>, version: String) {
+        private fun beginCachingTask(
+            assetList: ArrayList<String>,
+            version: String,
+            failureRepetition: Int
+        ) {
             RapidAssetCacheClient.onAssetsDownloadTaskInitiated(assetList)
 
-            val timer = Timer()
-            val timerTask: TimerTask = object : TimerTask() {
-                override fun run() {
-                    if (!RapidAssetCacheClient.isAssetDownloadTaskCompleted()) {
-                        RapidAssetCacheClient.getPendingAssetToBeCached(assetList).iterator().forEach { url ->
-                            // TODO: Add checksum check
-                            DownloadTask(url).queueFileDownload()
+            downloadJob = GlobalScope.launch {
+                repeat(10) {
+                    if (isActive) {
+                        if (it > failureRepetition) {
+                            this.cancel()
+                        } else {
+                            fetchAssetsFiles(assetList, version)
                         }
-                    } else {
-                        RapidAssetCacheClient.onAssetsDownloadTaskCompleted(version)
-                        timer.cancel()
+                        delay(10000)
                     }
                 }
             }
+        }
 
-            timer.schedule(timerTask, 0, 10000)
+        private fun fetchAssetsFiles(assetList: ArrayList<String>, version: String) {
+            if (!RapidAssetCacheClient.isAssetDownloadTaskCompleted()) {
+                RapidAssetCacheClient.getPendingAssetToBeCached(assetList).iterator()
+                    .forEach { url ->
+                        // TODO: Add checksum check
+                        DownloadTask(url).queueFileDownload()
+                    }
+            } else {
+                RapidAssetCacheClient.onAssetsDownloadTaskCompleted(version)
+                if (this::downloadJob.isInitialized)
+                    downloadJob.cancel()
+            }
         }
     }
+
 
     /**
      * This interface is called when asset manifest json file is fetched and processed
@@ -162,5 +179,4 @@ class RapidAssetCacheDownloader {
             })
         }
     }
-
 }
