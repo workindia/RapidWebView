@@ -46,7 +46,11 @@ export default function WithSubnavigation() {
         </Flex>
 
         <Flex flex={{ base: 2 }} justify={{ base: "center", md: "start" }}>
-          <Logo withText />
+          <NLink href={"/"} passHref>
+            <Link>
+              <Logo withText />
+            </Link>
+          </NLink>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />

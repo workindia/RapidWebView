@@ -50,13 +50,13 @@ const sideBarItems = [
     id: 6,
     type: "item",
     title: "Asset Downloader",
-    href: "/docs/arch/asset-downloader",
+    href: "/docs/arch/#asset-downloader",
   },
   {
     id: 7,
     type: "item",
     title: "WebView Request Interceptor",
-    href: "/docs/arch/request-interceptor",
+    href: "/docs/arch/#request-interceptor",
   },
   {
     id: 8,
