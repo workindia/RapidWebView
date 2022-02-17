@@ -1,5 +1,5 @@
-import { Stack, Box, Heading, Text, Button } from "@chakra-ui/react";
-import Link from "next/link";
+import { Stack, Box, Heading, Text, Button, Link } from "@chakra-ui/react";
+import NLink from "next/link";
 
 export default function Hero() {
   return (
@@ -14,15 +14,22 @@ export default function Hero() {
         fontSize={{ base: "xl", sm: "2xl", md: "4xl" }}
         lineHeight={"110%"}
       >
-        An Android library which utilises <br />
-        local caching to offer <br />
-        near native experience over WebView.
+        Native experience on WebView
+        <br />
+        made possible
       </Heading>
       <Text color={"gray.500"}>
-        RapidWebView is a library for your Android application which allows you
-        to load websites in a webview with a minimal TTI (Time To Interactive).
-        It also provides a generic set of Javascript Interface functions which
-        can let your website interact with some Android native functionalities.
+        Introducing RapidWebView - an open source library for your Android apps
+        for loading websites in a webview with minimal TTI (Time To
+        Interactive). That&apos;s not all, RapidWebView Javascript client comes
+        with a{" "}
+        <NLink href={"/docs/js-interface/functions"} passHref>
+          <Link color={"blue.600"} textDecor={"underline"}>
+            host of functionalities
+          </Link>
+        </NLink>{" "}
+        to make your webview interactive blurring the lines between webview and
+        native even further! It&apos;s easy, it&apos;s fast, and it&apos;s free.
       </Text>
       <Stack
         direction={"column"}
@@ -31,7 +38,7 @@ export default function Hero() {
         alignSelf={"center"}
         position={"relative"}
       >
-        <Link href={"/docs/getting-started"} passHref>
+        <NLink href={"/docs/getting-started"} passHref>
           <Button
             colorScheme={"blue"}
             bg={"blue.600"}
@@ -43,12 +50,12 @@ export default function Hero() {
           >
             Get Started
           </Button>
-        </Link>
-        <Link href={"/docs/arch"} passHref>
+        </NLink>
+        <NLink href={"/docs/arch"} passHref>
           <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
-            Learn more
+            How does it work?
           </Button>
-        </Link>
+        </NLink>
       </Stack>
     </Stack>
   );
