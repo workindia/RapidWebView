@@ -9,15 +9,16 @@
 <a href="/LICENSE" alt="License: MIT"><img src="https://img.shields.io/badge/License-MIT-orange.svg"></a>
 <a href="https://github.com/workindia/RapidWebView" alt="Forks"><img src="https://img.shields.io/github/forks/workindia/RapidWebView"></a>
 </p>
-<hr />
+
+***
 
 <h3 align="center">If you like our work you can show support by staring ⭐ this repository 👏</h4>
 
-<hr />
+***
 
 <p align="center">Getting started and documentation on our website: <a href="https://rapid-web-view.netlify.app/">Link</a></p>
 
-<hr />
+***
 
 ## Description
 
@@ -44,7 +45,10 @@ the pages loaded with and without RapidWebView SDK. The results can be seen belo
 Follow the guide [here](https://rapid-web-view.netlify.app/docs/getting-started)
 
 
-<hr />   
+***   
+
+## Changelog
+[CHANGELOG.md](https://github.com/workindia/RapidWebView/blob/master/CHANGELOG.md)
 
 ## Contribution
 
