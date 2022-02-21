@@ -34,7 +34,7 @@ import pub.devrel.easypermissions.EasyPermissions
 /**
  * Javascript interface with few pre-made general interface function
  */
-class RapidWebViewJSInterface(
+open class RapidWebViewJSInterface(
     private val context: Context,
     private val activity: Activity,
     private val webView: WebView
