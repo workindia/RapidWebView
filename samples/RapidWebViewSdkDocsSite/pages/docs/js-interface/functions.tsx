@@ -90,7 +90,7 @@ const FUNCTION_DOCS = [
   {
     id: 13,
     title: "Request permission",
-    description: 'To ask for android permission. It requires 3 parameters, an array containing all the permissions needed, rationale Text(text to show on permission dialog) and Integer request-code passed for callback in the form of string.',
+    description: 'To ask for android permission. It requires 3 parameters, an array containing all the permissions needed, rationale Text(text to show on permission dialog), and a callback. A callback is a reverse bridge between the Web and Android, it acts as a broadcast receiver from android to your website, it can be used to know whether your permission resulted in a success or a failure. If this information is not needed it can be passed as null.',
     code: '.requestPermissions(["android.permission.CALL_PHONE"], "Permission required",null)',
   },
   {
@@ -104,6 +104,12 @@ const FUNCTION_DOCS = [
     title: "Close current activity",
     description: 'Close the activity that holds the web view.',
     code: '.closeActivity()',
+  },
+  {
+    id: 16,
+    title: "Open native file upload interface",
+    description: 'To upload a file using native file upload interface. It accepts 3 parameters, the file type, upload Url(where the file will be uploaded), and third a callback, this callback is either a javascript function or url to open once file upload activity is finished. Callback function can receive whether upload file succeeded by embedding params in the callback string. ',
+    code: '.uploadFile("doc", "www.example.com/uploadfile", "https://example.com/api/fileUploaded/?data=$params")',
   },
 ];
 
