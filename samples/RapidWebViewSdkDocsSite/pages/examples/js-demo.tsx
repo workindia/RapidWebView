@@ -46,7 +46,7 @@ const demoItems = [
     id: 3,
     title: "Copy To Clipboard",
     description: "copyToClipboard(text: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#3",
     onClick: () => {
       // @ts-ignore
       app.copyToClipboard("Test message copied");
@@ -56,7 +56,7 @@ const demoItems = [
     id: 4,
     title: "Get installed apps list",
     description: "getInstalledAppList()",
-    link: "#",
+    link: "/docs/js-interface/functions#4",
     onClick: () => {
       const toast = createStandaloneToast();
       toast({
@@ -71,7 +71,7 @@ const demoItems = [
     id: 5,
     title: "Start an app activity",
     description: "startActivity(destActivity: string, intentParams: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#5",
     onClick: () => {
       // @ts-ignore
       app.startActivity(
@@ -84,7 +84,7 @@ const demoItems = [
     id: 6,
     title: "Open Browser",
     description: "openBrowserActivity(url: string, packageName: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#6",
     onClick: () => {
       // @ts-ignore
       app.openBrowserActivity(
@@ -97,7 +97,7 @@ const demoItems = [
     id: 7,
     title: "Open Chrome Custom Tab",
     description: "openCustomBrowserTab(url: string, color: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#7",
     onClick: () => {
       // @ts-ignore
       app.openCustomBrowserTab(
@@ -110,7 +110,7 @@ const demoItems = [
     id: 8,
     title: "Place a call / Open dialer",
     description: "openDialer(phoneNumber: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#8",
     onClick: () => {
       // @ts-ignore
       app.openDialer("+1234567890");
@@ -120,7 +120,7 @@ const demoItems = [
     id: 9,
     title: "Open an external intent (eg, google maps)",
     description: "openExternalIntent(packageName: string, uri: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#9",
     onClick: () => {
       // @ts-ignore
       app.openExternalIntent(
@@ -133,7 +133,7 @@ const demoItems = [
     id: 10,
     title: "Open share intent",
     description: "openShareIntent(text: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#10",
     onClick: () => {
       // @ts-ignore
       app.openShareIntent(
@@ -145,7 +145,7 @@ const demoItems = [
     id: 11,
     title: "Share to an application (eg, slack)",
     description: "shareToApp(packageName: string, shareText: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#11",
     onClick: () => {
       // @ts-ignore
       app.shareToApp(
@@ -158,7 +158,7 @@ const demoItems = [
     id: 12,
     title: "Check if permissions granted (eg, android.permission.CALL_PHONE)",
     description: "checkForPermission(permissions: Array<string>)",
-    link: "#",
+    link: "/docs/js-interface/functions#12",
     onClick: () => {
       const toast = createStandaloneToast();
       toast({
@@ -176,7 +176,7 @@ const demoItems = [
     title: "Request permission",
     description:
       "requestPermissions(permissions: Array<string>, rationaleText: string, callback: string?)",
-    link: "#",
+    link: "/docs/js-interface/functions#13",
     onClick: () => {
       // @ts-ignore
       app.requestPermissions(
@@ -191,7 +191,7 @@ const demoItems = [
     title: "Show notification",
     description:
       "showNotification(title: string, contentText: string, summaryText: string?, notificationIcon: string, notificationImage: string, destActivity: string)",
-    link: "#",
+    link: "/docs/js-interface/functions#14",
     onClick: () => {
       // @ts-ignore
       app.showNotification(
@@ -208,10 +208,20 @@ const demoItems = [
     id: 15,
     title: "Close current activity",
     description: "closeActivity()",
-    link: "#",
+    link: "/docs/js-interface/functions#15",
     onClick: () => {
       // @ts-ignore
       app.closeActivity();
+    },
+  },
+  {
+    id: 16,
+    title: "Open native file upload interface",
+    description: "uploadFile(fileType: String, uploadUrl: String, callback: String?)",
+    link: "/docs/js-interface/functions#16",
+    onClick: () => {
+      // @ts-ignore
+      app.uploadFile();
     },
   },
 ];
