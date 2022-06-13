@@ -1,7 +1,6 @@
 package `in`.workindia.rapidwebview.activities.service
 
 import `in`.workindia.rapidwebview.RapidWebViewNotificationHelper
-import `in`.workindia.rapidwebview.assetcache.RapidStorageUtility
 import `in`.workindia.rapidwebview.constants.BroadcastConstants
 import `in`.workindia.rapidwebview.network.RetrofitHelper
 import android.app.PendingIntent
@@ -14,6 +13,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -119,8 +119,7 @@ class UploadService : Service() {
         )
         val byteArray = fis?.readBytes()
 
-        val mediaType = RapidStorageUtility.getAssetMimeType(Uri.parse(fileUri)?.path.toString())
-            .toMediaTypeOrNull()
+        val mediaType: MediaType? = contentResolver.getType(Uri.parse(fileUri))?.toMediaTypeOrNull()
 
         if (byteArray != null && mediaType != null) {
             val requestBody: RequestBody = byteArray.toRequestBody(mediaType)
