@@ -179,21 +179,27 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
     private fun uploadImageFile() {
         val intent = Intent()
         intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activityResultLauncher.launch(Intent.createChooser(intent, "Select Image"))
     }
 
     private fun uploadVideoFile() {
         val intent = Intent()
         intent.type = "video/*"
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activityResultLauncher.launch(Intent.createChooser(intent, "Select Video"))
     }
 
     private fun uploadGeneralFile() {
         val intent = Intent()
         intent.type = "*/*"
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activityResultLauncher.launch(Intent.createChooser(intent, "Select File"))
     }
 
