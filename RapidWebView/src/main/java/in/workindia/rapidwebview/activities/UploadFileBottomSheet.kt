@@ -33,6 +33,8 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
     private var fileType: String = ""
     private var uploadUrl: String = ""
     private var callback: String? = null
+    private var requestMethod: String? = null
+    private var fileUri: String? = null
 
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var handlePathOz: HandlePathOz
@@ -48,6 +50,7 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
             fileType: String,
             uploadUrl: String,
             callback: String?,
+            requestMethod: String?,
             bottomSheetDialogInterface: BottomSheetDialogInterface
         ): UploadFileBottomSheet {
             val uploadResumeChatBottomSheet = UploadFileBottomSheet()
@@ -55,6 +58,7 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
             uploadResumeChatBottomSheet.fileType = fileType
             uploadResumeChatBottomSheet.uploadUrl = uploadUrl
             uploadResumeChatBottomSheet.callback = callback
+            uploadResumeChatBottomSheet.requestMethod = requestMethod
             uploadResumeChatBottomSheet.bottomSheetDialogInterface = bottomSheetDialogInterface
 
             return uploadResumeChatBottomSheet
@@ -81,6 +85,7 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val uri: Uri? = result.data?.data
+                    fileUri = uri.toString()
                     uri?.let { handlePathOz.getRealPath(it) }
                 }
             }
@@ -99,8 +104,9 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
 
             val serviceIntent = Intent(activity, UploadService::class.java)
             serviceIntent.putExtra("uploadUrl", uploadUrl)
-            serviceIntent.putExtra("filePath", pathOz.path)
+            serviceIntent.putExtra("fileUri", fileUri)
             serviceIntent.putExtra("callback", callback)
+            serviceIntent.putExtra("requestMethod", requestMethod)
             activity?.startService(serviceIntent)
 
         }

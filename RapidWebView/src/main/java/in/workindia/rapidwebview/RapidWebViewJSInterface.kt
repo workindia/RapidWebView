@@ -58,36 +58,36 @@ open class RapidWebViewJSInterface(
             override fun onReceive(context: Context?, intent: Intent) {
                 if (intent.action == BroadcastConstants.NATIVE_CALLBACK_ACTION) {
                     val permission = intent.getStringExtra(BroadcastConstants.PERMISSION)
-                    val callback = intent.getStringExtra(BroadcastConstants.CALLBACK)
+                    var callback = intent.getStringExtra(BroadcastConstants.CALLBACK)
+                        ?: "console.log('Callback not passed')"
                     val data = intent.getStringExtra(BroadcastConstants.UPLOAD)
                     when {
                         intent.getStringExtra(BroadcastConstants.UPLOAD)
                             ?.equals(BroadcastConstants.SUCCESS) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", data ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            callback =
+                                "window.dispatchEvent(new CustomEvent('$callback', { detail: { 'status' : \"success\" } }))"
                         }
                         intent.getStringExtra(BroadcastConstants.UPLOAD)
                             ?.equals(BroadcastConstants.FAILURE) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", data ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            callback =
+                                "window.dispatchEvent(new CustomEvent('$callback', { detail: { 'status' : \"failure\" } }))"
                         }
                         intent.getStringExtra(BroadcastConstants.PERMISSION)
                             ?.equals(BroadcastConstants.SUCCESS) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", permission ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            callback =
+                                "window.dispatchEvent(new CustomEvent('$callback', { detail: { 'status' : \"success\" } }))"
                         }
                         intent.getStringExtra(BroadcastConstants.PERMISSION)
                             ?.equals(BroadcastConstants.FAILURE) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", permission ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            callback =
+                                "window.dispatchEvent(new CustomEvent('$callback', { detail: { 'status' : \"failure\" } }))"
+                        }
+                    }
+                    webView.post {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                            webView.evaluateJavascript(callback, null);
+                        } else {
+                            webView.loadUrl("javascript:(function(){$callback})()");
                         }
                     }
                 }
@@ -508,12 +508,13 @@ open class RapidWebViewJSInterface(
      * TODO: accept upload header data to be passed along with uploadUrl
      */
     @JavascriptInterface
-    fun uploadFile(fileType: String, uploadUrl: String, callback: String?) {
+    fun uploadFile(fileType: String, uploadUrl: String, callback: String?, requestMethod: String?) {
         val intent = Intent(activity, UploadFileActivity::class.java)
 
         intent.putExtra("fileType", fileType)
         intent.putExtra("uploadUrl", uploadUrl)
         intent.putExtra("callback", callback)
+        intent.putExtra("requestMethod", requestMethod)
 
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 

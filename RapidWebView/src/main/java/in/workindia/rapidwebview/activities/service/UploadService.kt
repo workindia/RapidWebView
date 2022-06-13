@@ -1,7 +1,6 @@
 package `in`.workindia.rapidwebview.activities.service
 
 import `in`.workindia.rapidwebview.RapidWebViewNotificationHelper
-import `in`.workindia.rapidwebview.activities.UploadFileActivity
 import `in`.workindia.rapidwebview.assetcache.RapidStorageUtility
 import `in`.workindia.rapidwebview.constants.BroadcastConstants
 import `in`.workindia.rapidwebview.network.RetrofitHelper
@@ -9,6 +8,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Service
 import android.content.Intent
+import android.net.Uri
 import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -16,18 +16,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
+import java.io.FileInputStream
 
 
 class UploadService : Service() {
 
-    var path: String = ""
+    var fileUri: String = ""
     var uploadUrl: String = ""
     var callback: String = ""
+    var requestMethod: String = ""
 
     private var uploadStatusMutableLiveData: MutableLiveData<String> = MutableLiveData()
 
@@ -36,11 +37,12 @@ class UploadService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        path = intent?.getStringExtra("filePath") ?: ""
+        fileUri = intent?.getStringExtra("fileUri") ?: ""
         uploadUrl = intent?.getStringExtra("uploadUrl") ?: ""
         callback = intent?.getStringExtra("callback") ?: ""
+        requestMethod = intent?.getStringExtra("requestMethod") ?: "POST"
 
-        if (path.isBlank() || uploadUrl.isBlank()) {
+        if (fileUri.isBlank() || uploadUrl.isBlank()) {
             return START_NOT_STICKY
         }
 
@@ -53,7 +55,7 @@ class UploadService : Service() {
 
         uploadFilesUsingService()
 
-        uploadStatusMutableLiveData?.observeForever {
+        uploadStatusMutableLiveData.observeForever {
             val intentBroadcast = Intent(BroadcastConstants.NATIVE_CALLBACK_ACTION)
             if (it.equals("success")) {
                 intentBroadcast.putExtra(BroadcastConstants.UPLOAD, "success")
@@ -107,35 +109,60 @@ class UploadService : Service() {
     }
 
     private fun uploadFilesUsingService() {
-        val requestBody = File(path)
-            .asRequestBody(RapidStorageUtility.getAssetMimeType(path)?.toMediaTypeOrNull())
+        val uri = Uri.parse(fileUri)
+        val fis = FileInputStream(
+            this.contentResolver?.openFileDescriptor(
+                uri,
+                "r"
+            )?.fileDescriptor
+        )
+        val byteArray = fis?.readBytes()
 
-        if (requestBody.contentLength() > 0)
-            uploadFile(uploadUrl, requestBody, uploadStatusMutableLiveData)
-        else
-            uploadStatusMutableLiveData.postValue("failure")
+        val mediaType = RapidStorageUtility.getAssetMimeType(Uri.parse(fileUri)?.path.toString())
+            .toMediaTypeOrNull()
+
+        if (byteArray != null && mediaType != null) {
+            val requestBody: RequestBody = byteArray.toRequestBody(mediaType)
+            if (requestBody.contentLength() > 0) {
+                uploadFile(uploadUrl, requestBody, uploadStatusMutableLiveData, requestMethod)
+                return
+            }
+        }
+        uploadStatusMutableLiveData.postValue("failure")
     }
 
 
     private fun uploadFile(
         signedUrl: String,
         requestBody: RequestBody,
-        uploadStatusMutableLiveData: MutableLiveData<String>
+        uploadStatusMutableLiveData: MutableLiveData<String>,
+        requestMethod: String
     ) {
-        RetrofitHelper.createService.uploadFile(signedUrl, requestBody)
-            .enqueue(object : Callback<Void> {
-                override fun onResponse(
-                    call: Call<Void>,
-                    response: Response<Void>
-                ) {
-                    if (response.isSuccessful) {
-                        uploadStatusMutableLiveData.postValue("success")
-                    }
-                }
+        var call: Call<Void>? = null
+        if (requestMethod == "POST")
+            call = RetrofitHelper.createService.uploadFileViaPost(signedUrl, requestBody)
+        else if (requestMethod == "PUT")
+            call = RetrofitHelper.createService.uploadFileViaPut(signedUrl, requestBody)
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+        if (call == null) {
+            uploadStatusMutableLiveData.postValue("failure")
+            return
+        }
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(
+                call: Call<Void>,
+                response: Response<Void>
+            ) {
+                if (response.isSuccessful) {
+                    uploadStatusMutableLiveData.postValue("success")
+                } else {
                     uploadStatusMutableLiveData.postValue("failure")
                 }
-            })
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                uploadStatusMutableLiveData.postValue("failure")
+            }
+        })
     }
 }
