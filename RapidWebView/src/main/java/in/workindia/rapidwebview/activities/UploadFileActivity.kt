@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 class UploadFileActivity : AppCompatActivity(), BottomSheetDialogInterface {
     private var fileType: String? = ""
     private var uploadUrl: String? = ""
-    private var callback: String? = null
     private var requestMethod: String? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -25,7 +24,6 @@ class UploadFileActivity : AppCompatActivity(), BottomSheetDialogInterface {
 
         fileType = intent?.getStringExtra("fileType")
         uploadUrl = intent?.getStringExtra("uploadUrl")
-        callback = intent?.getStringExtra("callback")
         requestMethod = intent?.getStringExtra("requestMethod")
 
         if (fileType.isNullOrBlank() || uploadUrl.isNullOrBlank()) {
@@ -36,7 +34,6 @@ class UploadFileActivity : AppCompatActivity(), BottomSheetDialogInterface {
             UploadFileBottomSheet.getInstance(
                 fileType ?: "",
                 uploadUrl ?: "",
-                callback,
                 requestMethod ?: "POST",
                 this
             )

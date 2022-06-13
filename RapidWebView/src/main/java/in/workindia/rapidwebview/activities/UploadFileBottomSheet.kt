@@ -35,6 +35,7 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
     private var callback: String? = null
     private var requestMethod: String? = null
     private var fileUri: String? = null
+    private var fileName: String? = null
 
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var handlePathOz: HandlePathOz
@@ -49,7 +50,6 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
         fun getInstance(
             fileType: String,
             uploadUrl: String,
-            callback: String?,
             requestMethod: String?,
             bottomSheetDialogInterface: BottomSheetDialogInterface
         ): UploadFileBottomSheet {
@@ -57,7 +57,6 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
 
             uploadResumeChatBottomSheet.fileType = fileType
             uploadResumeChatBottomSheet.uploadUrl = uploadUrl
-            uploadResumeChatBottomSheet.callback = callback
             uploadResumeChatBottomSheet.requestMethod = requestMethod
             uploadResumeChatBottomSheet.bottomSheetDialogInterface = bottomSheetDialogInterface
 
@@ -105,8 +104,8 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
             val serviceIntent = Intent(activity, UploadService::class.java)
             serviceIntent.putExtra("uploadUrl", uploadUrl)
             serviceIntent.putExtra("fileUri", fileUri)
-            serviceIntent.putExtra("callback", callback)
             serviceIntent.putExtra("requestMethod", requestMethod)
+            serviceIntent.putExtra("fileName", fileName)
             activity?.startService(serviceIntent)
 
         }
@@ -227,7 +226,8 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
         if (!pathOz.path?.equals("")) {
             view?.findViewById<Group>(R.id.file_present)?.visibility = View.VISIBLE
             view?.findViewById<Group>(R.id.file_absent)?.visibility = View.GONE
-            view?.findViewById<TextView>(R.id.tv_file_name)?.text = File(pathOz?.path)?.name ?: ""
+            fileName = File(pathOz?.path)?.name ?: ""
+            view?.findViewById<TextView>(R.id.tv_file_name)?.text = fileName
             this.pathOz = pathOz
         }
     }

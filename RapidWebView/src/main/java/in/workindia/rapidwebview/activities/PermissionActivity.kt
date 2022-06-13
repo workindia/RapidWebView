@@ -13,7 +13,6 @@ import pub.devrel.easypermissions.EasyPermissions.requestPermissions
 class PermissionActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     private val rcGenericPermission: Int = 12312
     private lateinit var permissions: Array<String>
-    private var callback: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +21,6 @@ class PermissionActivity : AppCompatActivity(), EasyPermissions.PermissionCallba
         val intent = intent
 
         permissions = intent?.getStringArrayExtra("permissionList") as Array<String>
-        callback = intent?.getStringExtra("callback")
         val rationalText = intent?.getStringExtra("rationalText") ?: "This permission is required"
 
         if (permissions.isEmpty()) {
@@ -45,7 +43,6 @@ class PermissionActivity : AppCompatActivity(), EasyPermissions.PermissionCallba
         val intentBroadcast = Intent(BroadcastConstants.NATIVE_CALLBACK_ACTION)
 
         intentBroadcast.putExtra(BroadcastConstants.PERMISSION, status)
-        intentBroadcast.putExtra(BroadcastConstants.CALLBACK, callback)
         intentBroadcast.putExtra(BroadcastConstants.PERMISSION_LIST, permissions)
 
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentBroadcast)

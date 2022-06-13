@@ -27,8 +27,8 @@ class UploadService : Service() {
 
     var fileUri: String = ""
     var uploadUrl: String = ""
-    var callback: String = ""
     var requestMethod: String = ""
+    var fileName: String = ""
 
     private var uploadStatusMutableLiveData: MutableLiveData<String> = MutableLiveData()
 
@@ -39,8 +39,8 @@ class UploadService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         fileUri = intent?.getStringExtra("fileUri") ?: ""
         uploadUrl = intent?.getStringExtra("uploadUrl") ?: ""
-        callback = intent?.getStringExtra("callback") ?: ""
         requestMethod = intent?.getStringExtra("requestMethod") ?: "POST"
+        fileName = intent?.getStringExtra("fileName") ?: ""
 
         if (fileUri.isBlank() || uploadUrl.isBlank()) {
             return START_NOT_STICKY
@@ -59,7 +59,8 @@ class UploadService : Service() {
             val intentBroadcast = Intent(BroadcastConstants.NATIVE_CALLBACK_ACTION)
             if (it.equals("success")) {
                 intentBroadcast.putExtra(BroadcastConstants.UPLOAD, "success")
-                intentBroadcast.putExtra(BroadcastConstants.CALLBACK, callback)
+                intentBroadcast.putExtra(BroadcastConstants.UPLOADED_FILE_NAME, fileName)
+                intentBroadcast.putExtra(BroadcastConstants.UPLOADED_URL, uploadUrl)
 
                 createNotification(
                     "Success",
