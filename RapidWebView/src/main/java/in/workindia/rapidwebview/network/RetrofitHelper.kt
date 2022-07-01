@@ -6,10 +6,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Url
+import retrofit2.http.*
 
 /**
  * Singleton Retrofit class to create single instance of Retrofit
@@ -35,5 +32,8 @@ interface Urls {
     fun getAsset(@Url assetUrl: String): Call<ResponseBody>
 
     @POST()
-    fun uploadFile(@Url uploadUrl: String, @Body requestBody: RequestBody): Call<Void>
+    fun uploadFileViaPost(@Url uploadUrl: String, @Body requestBody: RequestBody): Call<Void>
+
+    @PUT()
+    fun uploadFileViaPut(@Url uploadUrl: String, @Body requestBody: RequestBody): Call<Void>
 }

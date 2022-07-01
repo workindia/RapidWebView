@@ -58,36 +58,38 @@ open class RapidWebViewJSInterface(
             override fun onReceive(context: Context?, intent: Intent) {
                 if (intent.action == BroadcastConstants.NATIVE_CALLBACK_ACTION) {
                     val permission = intent.getStringExtra(BroadcastConstants.PERMISSION)
-                    val callback = intent.getStringExtra(BroadcastConstants.CALLBACK)
-                    val data = intent.getStringExtra(BroadcastConstants.UPLOAD)
+                    val uploadUrl = intent.getStringExtra(BroadcastConstants.UPLOADED_URL) ?: ""
+                    val fileName =
+                        intent.getStringExtra(BroadcastConstants.UPLOADED_FILE_NAME) ?: ""
+                    var javaScript = ""
                     when {
                         intent.getStringExtra(BroadcastConstants.UPLOAD)
                             ?.equals(BroadcastConstants.SUCCESS) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", data ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+
+                            javaScript =
+                                "window.dispatchEvent(new CustomEvent('rapid-web-view-upload-listener', { detail: { 'status' : \"success\",'uploadUrl' : '$uploadUrl','uploadFileName' : '$fileName' } }))"
                         }
                         intent.getStringExtra(BroadcastConstants.UPLOAD)
                             ?.equals(BroadcastConstants.FAILURE) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", data ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            javaScript =
+                                "window.dispatchEvent(new CustomEvent('rapid-web-view-upload-listener', { detail: { 'status' : \"failure\" } }))"
                         }
                         intent.getStringExtra(BroadcastConstants.PERMISSION)
                             ?.equals(BroadcastConstants.SUCCESS) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", permission ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            javaScript =
+                                "window.dispatchEvent(new CustomEvent('rapid-web-view-permission-listener', { detail: { 'status' : \"success\",'permissionList' : '${permission.toString()}' } }))"
                         }
                         intent.getStringExtra(BroadcastConstants.PERMISSION)
                             ?.equals(BroadcastConstants.FAILURE) == true -> {
-                            if (callback?.contains("\$params") == true) {
-                                callback.replace("\$params", permission ?: "")
-                            }
-                            callback?.let { webView.loadUrl(it) }
+                            javaScript =
+                                "window.dispatchEvent(new CustomEvent('rapid-web-view-permission-listener', { detail: { 'status' : \"failure\" } }))"
+                        }
+                    }
+                    webView.post {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                            webView.evaluateJavascript(javaScript, null);
+                        } else {
+                            webView.loadUrl("javascript:(function(){$javaScript})()");
                         }
                     }
                 }
@@ -464,24 +466,12 @@ open class RapidWebViewJSInterface(
      * Opens an activity to request permissions from user
      * @param permissions: List of permissions to request from user
      * @param rationaleText: Text to show on permission dialog
-     * @param callback: This is either a javascript function or url to open once permission
-     * activity is finished. Callback function can receive list of installed apps by embedding
-     * `$params` in the callback string.
-     *
-     * Eg. callback = "javascript: onPermissionReceived($params)"
-     * Once the user responds to the permission request, below function will be run on WebView
-     * "javascript: onPermissionReceived(["permission1", "permission2"])"
-     *
-     * Eg. callback = "https://example.com/api/permissionGranted/?data=$params"
-     * Once the user responds to the permission request, below url will open on WebView
-     * "https://example.com/api/permissionGranted/?data=["permission1", "permission2"]"
      */
     @JavascriptInterface
-    fun requestPermissions(permissions: Array<String>, rationaleText: String, callback: String?) {
+    fun requestPermissions(permissions: Array<String>, rationaleText: String) {
         val intent = Intent(activity, PermissionActivity::class.java)
 
         intent.putExtra("permissionList", permissions)
-        intent.putExtra("callback", callback)
         intent.putExtra("rationalText", rationaleText)
 
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -493,27 +483,16 @@ open class RapidWebViewJSInterface(
      * Open native file upload interface
      * @param fileType type of file to be uploaded. Choices: `doc`, `image`, `video`, `file`
      * @param uploadUrl PUT request Url where file will be uploaded
-     * @param callback: This is either a javascript function or url to open once file upload
-     * activity is finished. Callback function can receive whether upload file succeeded by
-     * embedding `$params` in the callback string.
+     * @param requestMethod: Possible Input is POST & PUT
      *
-     * Eg. callback = "javascript: onFileUpload($params)"
-     * Once the file upload task completes, below function will be run on WebView
-     * "javascript: onFileUpload(true)"
-     *
-     * Eg. callback = "https://example.com/api/fileUploaded/?data=$params"
-     * Once the file upload task completes, below url will be run on WebView
-     * "https://example.com/api/fileUploaded/?data=false"
-     *
-     * TODO: accept upload header data to be passed along with uploadUrl
      */
     @JavascriptInterface
-    fun uploadFile(fileType: String, uploadUrl: String, callback: String?) {
+    fun uploadFile(fileType: String, uploadUrl: String, requestMethod: String?) {
         val intent = Intent(activity, UploadFileActivity::class.java)
 
         intent.putExtra("fileType", fileType)
         intent.putExtra("uploadUrl", uploadUrl)
-        intent.putExtra("callback", callback)
+        intent.putExtra("requestMethod", requestMethod)
 
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 

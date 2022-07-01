@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 class UploadFileActivity : AppCompatActivity(), BottomSheetDialogInterface {
     private var fileType: String? = ""
     private var uploadUrl: String? = ""
-    private var callback: String? = null
+    private var requestMethod: String? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +24,7 @@ class UploadFileActivity : AppCompatActivity(), BottomSheetDialogInterface {
 
         fileType = intent?.getStringExtra("fileType")
         uploadUrl = intent?.getStringExtra("uploadUrl")
-        callback = intent?.getStringExtra("callback")
+        requestMethod = intent?.getStringExtra("requestMethod")
 
         if (fileType.isNullOrBlank() || uploadUrl.isNullOrBlank()) {
             throw IllegalArgumentException("UploadFileActivity requires `fileType` and `uploadUrl` intent data")
@@ -34,7 +34,7 @@ class UploadFileActivity : AppCompatActivity(), BottomSheetDialogInterface {
             UploadFileBottomSheet.getInstance(
                 fileType ?: "",
                 uploadUrl ?: "",
-                callback,
+                requestMethod ?: "POST",
                 this
             )
 

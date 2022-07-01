@@ -33,6 +33,9 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
     private var fileType: String = ""
     private var uploadUrl: String = ""
     private var callback: String? = null
+    private var requestMethod: String? = null
+    private var fileUri: String? = null
+    private var fileName: String? = null
 
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var handlePathOz: HandlePathOz
@@ -47,14 +50,14 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
         fun getInstance(
             fileType: String,
             uploadUrl: String,
-            callback: String?,
+            requestMethod: String?,
             bottomSheetDialogInterface: BottomSheetDialogInterface
         ): UploadFileBottomSheet {
             val uploadResumeChatBottomSheet = UploadFileBottomSheet()
 
             uploadResumeChatBottomSheet.fileType = fileType
             uploadResumeChatBottomSheet.uploadUrl = uploadUrl
-            uploadResumeChatBottomSheet.callback = callback
+            uploadResumeChatBottomSheet.requestMethod = requestMethod
             uploadResumeChatBottomSheet.bottomSheetDialogInterface = bottomSheetDialogInterface
 
             return uploadResumeChatBottomSheet
@@ -81,6 +84,7 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val uri: Uri? = result.data?.data
+                    fileUri = uri.toString()
                     uri?.let { handlePathOz.getRealPath(it) }
                 }
             }
@@ -99,8 +103,9 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
 
             val serviceIntent = Intent(activity, UploadService::class.java)
             serviceIntent.putExtra("uploadUrl", uploadUrl)
-            serviceIntent.putExtra("filePath", pathOz.path)
-            serviceIntent.putExtra("callback", callback)
+            serviceIntent.putExtra("fileUri", fileUri)
+            serviceIntent.putExtra("requestMethod", requestMethod)
+            serviceIntent.putExtra("fileName", fileName)
             activity?.startService(serviceIntent)
 
         }
@@ -174,21 +179,27 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
     private fun uploadImageFile() {
         val intent = Intent()
         intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activityResultLauncher.launch(Intent.createChooser(intent, "Select Image"))
     }
 
     private fun uploadVideoFile() {
         val intent = Intent()
         intent.type = "video/*"
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activityResultLauncher.launch(Intent.createChooser(intent, "Select Video"))
     }
 
     private fun uploadGeneralFile() {
         val intent = Intent()
         intent.type = "*/*"
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activityResultLauncher.launch(Intent.createChooser(intent, "Select File"))
     }
 
@@ -221,7 +232,8 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
         if (!pathOz.path?.equals("")) {
             view?.findViewById<Group>(R.id.file_present)?.visibility = View.VISIBLE
             view?.findViewById<Group>(R.id.file_absent)?.visibility = View.GONE
-            view?.findViewById<TextView>(R.id.tv_file_name)?.text = File(pathOz?.path)?.name ?: ""
+            fileName = File(pathOz?.path)?.name ?: ""
+            view?.findViewById<TextView>(R.id.tv_file_name)?.text = fileName
             this.pathOz = pathOz
         }
     }
