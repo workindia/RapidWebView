@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
-## [Unreleased]
+## [1.2.0] - 2022-09-19
+### Changed
 - Changed File Provider and Authorities
   - changed file provider and authorities for RapidWebView SDK
   - Fixed Image Sharing Intent
