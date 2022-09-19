@@ -40,7 +40,7 @@ open class RapidWebViewJSInterface(
     private val webView: WebView
 ) {
     companion object {
-        private const val CACHE_AUTHORITY = "in.workindia.rapidwebview.provider"
+        private const val CACHE_AUTHORITY = "in.workindia.rapidwebview.provider.rvwfileprovider"
     }
 
     /**
@@ -538,8 +538,16 @@ open class RapidWebViewJSInterface(
             )
         )
         val intent = Intent(context.applicationContext, Class.forName(destActivity))
+        val flag =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+
         val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                flag
+            )
 
         val imageNotification = getBitmapForNotification(notificationImage)
         val imageIcon = getBitmapForNotification(notificationIcon)
