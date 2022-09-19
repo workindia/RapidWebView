@@ -26,10 +26,8 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import br.com.onimur.handlepathoz.BuildConfig.LIBRARY_PACKAGE_NAME
 import org.json.JSONException
 import org.json.JSONObject
-import pub.devrel.easypermissions.BuildConfig
 import pub.devrel.easypermissions.EasyPermissions
 
 
