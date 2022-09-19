@@ -39,9 +39,6 @@ open class RapidWebViewJSInterface(
     private val activity: Activity,
     private val webView: WebView
 ) {
-    companion object {
-        private const val CACHE_AUTHORITY = "in.workindia.rapidwebview.provider"
-    }
 
     /**
      * BroadCastReceiver to update push data to the page loaded on RapidWebView. The receiver
@@ -382,7 +379,7 @@ open class RapidWebViewJSInterface(
             if (shareImageUri != null) {
                 val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
                 val photoUri =
-                    FileProvider.getUriForFile(context, CACHE_AUTHORITY, file)
+                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
                 sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -446,7 +443,7 @@ open class RapidWebViewJSInterface(
             if (shareImageUri != null) {
                 val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
                 val photoUri =
-                    FileProvider.getUriForFile(context, CACHE_AUTHORITY, file)
+                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
                 shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
