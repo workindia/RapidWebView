@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
+- Changed File Provider and Authorities
+  - changed file provider and authorities for RapidWebView SDK
+  - Fixed Image Sharing Intent
+- Migration to Android 13
+  - Changed CompileSDK and TargetSDK to 33
+  - Changed Notification Pending Intents for new API android
 
 ***
 
