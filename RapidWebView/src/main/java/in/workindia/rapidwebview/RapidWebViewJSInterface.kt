@@ -39,9 +39,6 @@ open class RapidWebViewJSInterface(
     private val activity: Activity,
     private val webView: WebView
 ) {
-    companion object {
-        private const val CACHE_AUTHORITY = "in.workindia.rapidwebview.provider"
-    }
 
     /**
      * BroadCastReceiver to update push data to the page loaded on RapidWebView. The receiver
@@ -382,7 +379,7 @@ open class RapidWebViewJSInterface(
             if (shareImageUri != null) {
                 val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
                 val photoUri =
-                    FileProvider.getUriForFile(context, CACHE_AUTHORITY, file)
+                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
                 sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -446,7 +443,7 @@ open class RapidWebViewJSInterface(
             if (shareImageUri != null) {
                 val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
                 val photoUri =
-                    FileProvider.getUriForFile(context, CACHE_AUTHORITY, file)
+                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
                 shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -538,8 +535,16 @@ open class RapidWebViewJSInterface(
             )
         )
         val intent = Intent(context.applicationContext, Class.forName(destActivity))
+        val flag =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+
         val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                flag
+            )
 
         val imageNotification = getBitmapForNotification(notificationImage)
         val imageIcon = getBitmapForNotification(notificationIcon)

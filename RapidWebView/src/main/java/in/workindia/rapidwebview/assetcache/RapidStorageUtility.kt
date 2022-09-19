@@ -164,6 +164,12 @@ class RapidStorageUtility {
         fun getImageUriFromFileName(shareImage: String): File {
             return getCacheFileInstance(shareImage)
         }
+
+        @JvmStatic
+        fun getAuthority(): String {
+            val context = RapidClient.getInstance().getAppContext()
+            return context.packageName + ".rwv.provider"
+        }
     }
 
     class AssetVersion {
