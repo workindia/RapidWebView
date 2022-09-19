@@ -26,6 +26,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import br.com.onimur.handlepathoz.BuildConfig.LIBRARY_PACKAGE_NAME
 import org.json.JSONException
 import org.json.JSONObject
 import pub.devrel.easypermissions.BuildConfig
@@ -41,7 +42,7 @@ open class RapidWebViewJSInterface(
     private val webView: WebView
 ) {
     companion object {
-        private const val CACHE_AUTHORITY = BuildConfig.APPLICATION_ID + ".provider"
+        private const val CACHE_AUTHORITY = "in.workindia.rapidwebview.provider"
     }
 
     /**
