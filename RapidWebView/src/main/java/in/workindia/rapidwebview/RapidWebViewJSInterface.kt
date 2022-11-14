@@ -444,10 +444,8 @@ open class RapidWebViewJSInterface(
             val shareImageUri = RapidStorageUtility.getImageUriFromFileName(shareImage)
             if (shareImageUri != null) {
                 val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
-                val photoUri =
-                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
-
-                shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
+                file.setReadable(true, false)
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                 return try {
