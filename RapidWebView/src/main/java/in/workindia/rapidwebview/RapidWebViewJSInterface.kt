@@ -24,7 +24,6 @@ import android.webkit.WebView
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
-import androidx.core.app.ShareCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.json.JSONException
@@ -371,6 +370,7 @@ open class RapidWebViewJSInterface(
     fun openShareIntent(shareText: String, shareImage: String): Boolean {
         val sendIntent = Intent(Intent.ACTION_SEND)
         sendIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+        sendIntent.type = "text/plain"
 
         if (shareImage.isNotEmpty()) {
             val shareImageUri = RapidStorageUtility.getImageUriFromFileName(
@@ -381,13 +381,18 @@ open class RapidWebViewJSInterface(
                 val photoUri =
                     FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
-                val intent: Intent = ShareCompat.IntentBuilder.from(activity)
-                    .setType("image/jpg")
-                    .setStream(photoUri)
-                    .createChooserIntent()
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
+                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                Intent.createChooser(intent,"Share")
+                return try {
+                    context.startActivity(
+                        Intent.createChooser(sendIntent, "Share")
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                    true
+                } catch (e: ActivityNotFoundException) {
+                    false
+                }
             }
         }
 
