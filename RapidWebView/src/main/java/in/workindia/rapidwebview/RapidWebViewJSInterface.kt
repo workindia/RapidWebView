@@ -370,31 +370,28 @@ open class RapidWebViewJSInterface(
     fun openShareIntent(shareText: String, shareImage: String): Boolean {
         val sendIntent = Intent(Intent.ACTION_SEND)
         sendIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+        sendIntent.type = "text/plain"
 
         if (shareImage.isNotEmpty()) {
             val shareImageUri = RapidStorageUtility.getImageUriFromFileName(
                 RapidStorageUtility.formatFileName(shareImage)
             )
             if (shareImageUri != null) {
-                val shareImageUri = RapidStorageUtility.getImageUriFromFileName(shareImage)
-                if (shareImageUri != null) {
-                    val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
-                    file.setReadable(true, false)
-                    var uri: Uri? = null
-                    if (Build.VERSION.SDK_INT < 24) {
-                        uri = Uri.fromFile(file);
-                    } else {
-                        uri = Uri.parse(file.path); // My work-around for SDKs up to 29.
-                    }
-                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
-                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
+                val photoUri =
+                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
-                    return try {
-                        context.startActivity(sendIntent)
-                        true
-                    } catch (e: ActivityNotFoundException) {
-                        false
-                    }
+                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
+                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                return try {
+                    context.startActivity(
+                        Intent.createChooser(sendIntent, "Share")
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                    true
+                } catch (e: ActivityNotFoundException) {
+                    false
                 }
             }
         }
@@ -445,8 +442,10 @@ open class RapidWebViewJSInterface(
             val shareImageUri = RapidStorageUtility.getImageUriFromFileName(shareImage)
             if (shareImageUri != null) {
                 val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
-                file.setReadable(true, false)
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+                val photoUri =
+                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
+
+                shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                 return try {
