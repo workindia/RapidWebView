@@ -376,24 +376,19 @@ open class RapidWebViewJSInterface(
                 RapidStorageUtility.formatFileName(shareImage)
             )
             if (shareImageUri != null) {
-                val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
-                val photoUri =
-                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
-                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                sendIntent.setDataAndType(
-                    photoUri,
-                    context.contentResolver.getType(photoUri)
-                )
-                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
+                val shareImageUri = RapidStorageUtility.getImageUriFromFileName(shareImage)
+                if (shareImageUri != null) {
+                    val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
+                    file.setReadable(true, false)
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                return try {
-                    context.startActivity(
-                        Intent.createChooser(sendIntent, "Share")
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
-                    true
-                } catch (e: ActivityNotFoundException) {
-                    false
+                    return try {
+                        context.startActivity(sendIntent)
+                        true
+                    } catch (e: ActivityNotFoundException) {
+                        false
+                    }
                 }
             }
         }
