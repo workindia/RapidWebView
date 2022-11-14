@@ -380,7 +380,13 @@ open class RapidWebViewJSInterface(
                 if (shareImageUri != null) {
                     val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
                     file.setReadable(true, false)
-                    sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+                    var uri: Uri? = null
+                    if (Build.VERSION.SDK_INT < 24) {
+                        uri = Uri.fromFile(file);
+                    } else {
+                        uri = Uri.parse(file.path); // My work-around for SDKs up to 29.
+                    }
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
                     sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     return try {
