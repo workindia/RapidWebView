@@ -387,7 +387,7 @@ open class RapidWebViewJSInterface(
                     .createChooserIntent()
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                context.startActivity(intent)
+                Intent.createChooser(intent,"Share")
             }
         }
 
