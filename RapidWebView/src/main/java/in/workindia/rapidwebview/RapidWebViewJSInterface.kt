@@ -407,48 +407,6 @@ open class RapidWebViewJSInterface(
         return false
     }
 
-    @JavascriptInterface
-    fun openShareIntentStub() {
-        val sendIntent = Intent()
-        var contentUri: Uri? = null
-        val cachePath: File =
-            File(context.cacheDir, "cache_file")
-        if (cachePath.exists()) {
-            val newFile = File(cachePath, "share.jpeg")
-            if (newFile.exists()) {
-                try {
-                    contentUri = FileProvider.getUriForFile(
-                        context, RapidStorageUtility.getAuthority(),
-                        newFile
-                    )
-                } catch (e: java.lang.Exception) {
-                    e.printStackTrace()
-                    contentUri = null
-                }
-            }
-        } else {
-            cachePath.mkdirs()
-        }
-        if (contentUri != null) {
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // temp permission for receiving app to read this file
-            sendIntent.setDataAndType(
-                contentUri,
-                context.contentResolver.getType(contentUri)
-            )
-            sendIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-        } else {
-            sendIntent.type = "text/plain"
-        }
-
-        val textToSend: String = "text" + "\n\n" + "url"
-
-        sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, textToSend)
-
-        context.startActivity(sendIntent)
-
-    }
-
     /**
      * Share text to specific app
      * @param packageName package name of app
@@ -495,8 +453,12 @@ open class RapidWebViewJSInterface(
                 val photoUri =
                     FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
 
-                shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                shareIntent.setDataAndType(
+                    photoUri,
+                    context.contentResolver.getType(photoUri)
+                )
+                shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
 
                 return try {
                     context.startActivity(shareIntent)
