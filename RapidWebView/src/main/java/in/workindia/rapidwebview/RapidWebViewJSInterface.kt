@@ -29,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.json.JSONException
 import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
+import java.io.File
 
 
 /**
@@ -373,16 +374,23 @@ open class RapidWebViewJSInterface(
         sendIntent.type = "text/plain"
 
         if (shareImage.isNotEmpty()) {
-            val shareImageUri = RapidStorageUtility.getImageUriFromFileName(
+            val shareImageFile = RapidStorageUtility.getImageUriFromFileName(
                 RapidStorageUtility.formatFileName(shareImage)
             )
-            if (shareImageUri != null) {
-                val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
+            if (shareImageFile != null) {
                 val photoUri =
-                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
+                    FileProvider.getUriForFile(
+                        context,
+                        RapidStorageUtility.getAuthority(),
+                        shareImageFile
+                    )
 
-                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                sendIntent.setDataAndType(
+                    photoUri,
+                    context.contentResolver.getType(photoUri)
+                )
+                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
 
                 return try {
                     context.startActivity(
@@ -397,6 +405,48 @@ open class RapidWebViewJSInterface(
         }
 
         return false
+    }
+
+    @JavascriptInterface
+    fun openShareIntentStub() {
+        val sendIntent = Intent()
+        var contentUri: Uri? = null
+        val cachePath: File =
+            File(context.cacheDir, "cache_file")
+        if (cachePath.exists()) {
+            val newFile = File(cachePath, "share.jpeg")
+            if (newFile.exists()) {
+                try {
+                    contentUri = FileProvider.getUriForFile(
+                        context, RapidStorageUtility.getAuthority(),
+                        newFile
+                    )
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                    contentUri = null
+                }
+            }
+        } else {
+            cachePath.mkdirs()
+        }
+        if (contentUri != null) {
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // temp permission for receiving app to read this file
+            sendIntent.setDataAndType(
+                contentUri,
+                context.contentResolver.getType(contentUri)
+            )
+            sendIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+        } else {
+            sendIntent.type = "text/plain"
+        }
+
+        val textToSend: String = "text" + "\n\n" + "url"
+
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT, textToSend)
+
+        context.startActivity(sendIntent)
+
     }
 
     /**
