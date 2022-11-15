@@ -2,5 +2,5 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <cache-path
         name="RapidWebView"
-        path="rapidWebView/" />
+        path="." />
 </paths>
