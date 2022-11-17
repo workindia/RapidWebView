@@ -373,16 +373,23 @@ open class RapidWebViewJSInterface(
         sendIntent.type = "text/plain"
 
         if (shareImage.isNotEmpty()) {
-            val shareImageUri = RapidStorageUtility.getImageUriFromFileName(
+            val shareImageFile = RapidStorageUtility.getImageUriFromFileName(
                 RapidStorageUtility.formatFileName(shareImage)
             )
-            if (shareImageUri != null) {
-                val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
+            if (shareImageFile != null) {
                 val photoUri =
-                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
+                    FileProvider.getUriForFile(
+                        context,
+                        RapidStorageUtility.getAuthority(),
+                        shareImageFile
+                    )
 
-                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
                 sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                sendIntent.setDataAndType(
+                    photoUri,
+                    context.contentResolver.getType(photoUri)
+                )
+                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
 
                 return try {
                     context.startActivity(
@@ -432,24 +439,35 @@ open class RapidWebViewJSInterface(
      */
     @JavascriptInterface
     fun shareToApp(packageName: String, shareText: String, shareImage: String): Boolean {
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type = "text/plain"
-        shareIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        shareIntent.setPackage(packageName)
-        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+        val sendIntent = Intent(Intent.ACTION_SEND)
+        sendIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+        sendIntent.setPackage(packageName)
+        sendIntent.type = "text/plain"
 
         if (shareImage.isNotEmpty()) {
-            val shareImageUri = RapidStorageUtility.getImageUriFromFileName(shareImage)
-            if (shareImageUri != null) {
-                val file = RapidStorageUtility.getImageUriFromFileName(shareImage)
+            val shareImageFile = RapidStorageUtility.getImageUriFromFileName(
+                RapidStorageUtility.formatFileName(shareImage)
+            )
+            if (shareImageFile != null) {
                 val photoUri =
-                    FileProvider.getUriForFile(context, RapidStorageUtility.getAuthority(), file)
+                    FileProvider.getUriForFile(
+                        context,
+                        RapidStorageUtility.getAuthority(),
+                        shareImageFile
+                    )
 
-                shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                sendIntent.setDataAndType(
+                    photoUri,
+                    context.contentResolver.getType(photoUri)
+                )
+                sendIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
 
                 return try {
-                    context.startActivity(shareIntent)
+                    context.startActivity(
+                        Intent.createChooser(sendIntent, "Share")
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
                     true
                 } catch (e: ActivityNotFoundException) {
                     false
