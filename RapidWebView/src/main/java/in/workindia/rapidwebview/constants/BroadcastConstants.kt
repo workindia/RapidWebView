@@ -11,5 +11,11 @@ class BroadcastConstants {
         const val SUCCESS = "success"
         const val FAILURE = "failure"
         const val CALLBACK = "js_callback"
+        const val DOWNLOAD_URL = "download_url"
+        const val FILE_NAME = "fileName"
+        const val DOWNLOAD_LOCATION = "downloadLocation"
+        const val PERMISSION_LIST_INTENT = "permissionList"
+        const val RATIONAL_TEXT = "rationalText"
+        const val PROVIDER_SUFFIX = ".rwv.provider"
     }
 }

@@ -181,8 +181,7 @@ const demoItems = [
       // @ts-ignore
       app.requestPermissions(
         ["android.permission.CALL_PHONE"],
-        "Permission required",
-        null
+        "Permission required"
       );
     },
   },
@@ -221,9 +220,29 @@ const demoItems = [
     link: "/docs/js-interface/functions#16",
     onClick: () => {
       // @ts-ignore
-      app.uploadFile();
+      app.uploadFile("doc","https://google.com/pagead/form-data/1039234079?gtm=45be48s0v9166926293za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=0&npa=0&frm=0&auid=1101065353.1725344348&uaa=arm&uab=64&uafvl=Chromium%3B128.0.6613.113%7CNot%253BA%253DBrand%3B24.0.0.0%7CGoogle%2520Chrome%3B128.0.6613.113&uamb=0&uam=&uap=macOS&uapv=14.6.1&uaw=0","PUT");
     },
   },
+  {
+    id: 17,
+    title: "Download file locally",
+    description: "downLoadFileLocally(url: String, fileName: String?, downloadLocation: String?)",
+    link: "/docs/js-interface/functions#17",
+    onClick: () => {
+      // @ts-ignore
+      app.downLoadFileLocally("https://s29.q4cdn.com/175625835/files/doc_downloads/test.pdf","","PUBLIC_DOWNLOADS");
+    },
+  },
+  {
+    id: 18,
+    title: "Download locally and Open the file",
+    description: "downLoadAndOpenFile(url: String, fileName: String?, downloadLocation: String?)",
+    link: "/docs/js-interface/functions#18",
+    onClick: () => {
+      // @ts-ignore
+      app.downLoadAndOpenFile("https://s29.q4cdn.com/175625835/files/doc_downloads/test.pdf","","PUBLIC_DOWNLOADS");
+    },
+  }
 ];
 
 {

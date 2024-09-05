@@ -3,6 +3,7 @@
     package="in.workindia.rapidwebviewandroidsample">
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".BaseApplication"
@@ -11,7 +12,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RapidWebViewAndroidSample">
+        android:theme="@style/Theme.RapidWebViewAndroidSample"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".WebViewActivity"
             android:exported="false" />

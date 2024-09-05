@@ -1,11 +1,17 @@
 package `in`.workindia.rapidwebview.activities
 
-import `in`.workindia.rapidwebview.R
-import `in`.workindia.rapidwebview.constants.BroadcastConstants
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import `in`.workindia.rapidwebview.R
+import `in`.workindia.rapidwebview.constants.BroadcastConstants
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.DOWNLOAD_LOCATION
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.DOWNLOAD_URL
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.FILE_NAME
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMISSION_LIST_INTENT
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.RATIONAL_TEXT
+import `in`.workindia.rapidwebview.utils.Utils
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.EasyPermissions.requestPermissions
 
@@ -20,8 +26,8 @@ class PermissionActivity : AppCompatActivity(), EasyPermissions.PermissionCallba
 
         val intent = intent
 
-        permissions = intent?.getStringArrayExtra("permissionList") as Array<String>
-        val rationalText = intent?.getStringExtra("rationalText") ?: "This permission is required"
+        permissions = intent?.getStringArrayExtra(PERMISSION_LIST_INTENT) as Array<String>
+        val rationalText = intent?.getStringExtra(RATIONAL_TEXT) ?: "This permission is required"
 
         if (permissions.isEmpty()) {
             throw IllegalArgumentException("PermissionActivity requires `permissionList` intent data")
@@ -44,10 +50,25 @@ class PermissionActivity : AppCompatActivity(), EasyPermissions.PermissionCallba
 
         intentBroadcast.putExtra(BroadcastConstants.PERMISSION, status)
         intentBroadcast.putExtra(BroadcastConstants.PERMISSION_LIST, permissions)
+        appendPendingDataToIntent(intentBroadcast)
 
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentBroadcast)
 
         finish()
+    }
+
+    private fun appendPendingDataToIntent(intentBrodCast: Intent) {
+        val bundle = intent.extras
+        val url: String? = bundle?.getString(DOWNLOAD_URL)
+        val fileName: String? = bundle?.getString(FILE_NAME)
+        val downloadLocationName: String =
+            Utils.toDownloadLocation(bundle?.getString(DOWNLOAD_LOCATION)).name
+
+        intentBrodCast.putExtras(Bundle().apply {
+            putString(DOWNLOAD_URL, url)
+            putString(FILE_NAME, fileName)
+            putString(DOWNLOAD_LOCATION, downloadLocationName)
+        })
     }
 
     override fun onRequestPermissionsResult(

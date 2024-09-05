@@ -3,8 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="in.workindia.rapidwebview">
 
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
 
@@ -30,7 +39,10 @@
             android:exported="false"
             android:theme="@style/Theme.Transparent.Activity" />
 
-        <service android:name="in.workindia.rapidwebview.activities.service.UploadService" />
+        <service android:name="in.workindia.rapidwebview.activities.service.UploadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            />
     </application>
 
 </manifest>

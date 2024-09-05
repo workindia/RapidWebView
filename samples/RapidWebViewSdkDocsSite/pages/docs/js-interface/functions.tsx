@@ -78,7 +78,7 @@ const FUNCTION_DOCS = [
   {
     id: 11,
     title: "Share to an application (eg, slack)",
-    description: 'Share text with a specific app. It requires two paramters, the package name of the app with which text is need to be shared, and second paramter the text to be shared.',
+    description: 'Share text with a specific app. It requires two parameters, the package name of the app with which text is need to be shared, and second paramter the text to be shared.',
     code: '.shareToApp("com.Slack", "Checkout this SDK: https://github.com/workindia/RapidWebView")',
   },
   {
@@ -110,6 +110,18 @@ const FUNCTION_DOCS = [
     title: "Open native file upload interface",
     description: 'To upload a file using native file upload interface. It accepts 3 parameters, the file type, upload Url(where the file will be uploaded), and third a method to either "PUT" or "POST", Callbacks from native can be used by using javascript event listener with the event "rapid-web-view-upload-listener" which will return object { detail: { "status" : "success","uploadUrl" : "$uploadUrl","uploadFileName" : "$fileName"} }',
     code: '.uploadFile("doc", "www.example.com/uploadfile", "PUT|POST")',
+  },
+  {
+    id: 17,
+    title: "Download file locally",
+    description: 'To download a file using native DownloadManager.It takes accepts 3 parameters: url (String?), which is the mandatory URL of the file to download; fileName (String?), an optional parameter for specifying the name of the saved file, defaulting to a lastSegment or the url if not provided; and downloadLocation (String?), which determines the save location and can be "EXTERNAL_FILES"(app specific storage accessible for other apps), or "PUBLIC_DOWNLOADS", with a default to the public Downloads directory. If the required WRITE_EXTERNAL_STORAGE permission is not granted, the function will trigger an activity to request the permission before proceeding with the download.',
+    code: '.downLoadFileLocally("https://sample-videos.com/doc/Sample-doc-file-2000kb.doc","file.doc","PUBLIC_DOWNLOADS")'
+  },
+  {
+    id: 18,
+    title: "Download locally and Open the file",
+    description: 'To download and Open the file using native DownloadManager.It takes accepts 3 parameters: url (String?), which is the mandatory URL of the file to download; fileName (String?), an optional parameter for specifying the name of the saved file, defaulting to a lastSegment or the url if not provided; and downloadLocation (String?), which determines the save location and can be "EXTERNAL_FILES"(app specific storage accessible for other apps), or "PUBLIC_DOWNLOADS", with a default to the public Downloads directory. If the required WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE permissions are not granted, the function will trigger an activity to request the permission before proceeding with the download.',
+    code: '.downLoadAndOpenFile("https://sample-videos.com/doc/Sample-doc-file-2000kb.doc","file.doc","EXTERNAL_FILES")'
   },
 ];
 
