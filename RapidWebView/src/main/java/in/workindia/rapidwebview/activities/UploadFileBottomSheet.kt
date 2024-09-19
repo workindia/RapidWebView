@@ -23,7 +23,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import `in`.workindia.rapidwebview.R
 import `in`.workindia.rapidwebview.activities.service.UploadService
 import `in`.workindia.rapidwebview.constants.BroadcastConstants
-import `in`.workindia.rapidwebview.utils.RapidPermissionHelper
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
@@ -116,13 +115,6 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
 
     @AfterPermissionGranted(rcPermissionDocument)
     private fun chooseUpload() {
-        val requiredPermissions = RapidPermissionHelper.requiredPermissionsForRead(fileType)
-
-        if (EasyPermissions.hasPermissions(
-                requireContext(),
-                *requiredPermissions
-            )
-        ) {
             when (fileType) {
                 "doc" -> {
                     uploadDocFile()
@@ -137,14 +129,6 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
                     uploadGeneralFile()
                 }
             }
-        } else {
-            EasyPermissions.requestPermissions(
-                this,
-                "File Storage Permission is Required",
-                rcPermissionDocument,
-                *requiredPermissions
-            )
-        }
     }
 
     private fun uploadDocFile() {
