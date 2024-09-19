@@ -3,7 +3,13 @@
     package="in.workindia.rapidwebviewandroidsample">
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <application
         android:name=".BaseApplication"
@@ -12,8 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RapidWebViewAndroidSample"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/Theme.RapidWebViewAndroidSample">
         <activity
             android:name=".WebViewActivity"
             android:exported="false" />
