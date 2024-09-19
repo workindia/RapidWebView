@@ -12,8 +12,9 @@ const FUNCTION_DOCS = [
   {
     id: 1,
     title: "Vibrate",
-    description:
+    description: 
       "Vibrate the device. Takes vibration duration (in milliseconds) as a function parameter.",
+    note: "Requires `android.permission.VIBRATE` to be declared in the manifest file.",
     code: "// vibrate the device for 1 second \n.vibrate(1000);",
   },
   {
@@ -61,6 +62,7 @@ const FUNCTION_DOCS = [
     id: 8,
     title: "Place a call / Open dialer",
     description: 'Open a dialer (and call a number if permission is granted). It only requires one paramter the mobile number in the form of string.',
+    note: "Requires permission `android.permission.CALL_PHONE` to place a call.",
     code: '.openDialer("1234567890")',
   },
   {
@@ -90,13 +92,15 @@ const FUNCTION_DOCS = [
   {
     id: 13,
     title: "Request permission",
-    description: 'To ask for android permission. It requires 2 parameters, an array containing all the permissions needed, rationale Text(text to show on permission dialog), and a callback. Callbacks from native can be used by using javascript event listener with the event "rapid-web-view-permission-listener" which will return object { detail: { "status" : "success","uploadUrl" : "$uploadUrl","uploadFileName" : "$fileName"} }',
+    description: 'To ask for android permission. It requires 2 parameters, an array containing all the permissions needed, rationale Text(text to show on permission dialog), and a callback.',
+    event: 'Callbacks from native can be used by using javascript event listener with the event "rapid-web-view-permission-listener" which will return object { detail: { "status" : "success","uploadUrl" : "$uploadUrl","uploadFileName" : "$fileName"} }',
     code: '.requestPermissions(["android.permission.CALL_PHONE"], "Permission required")',
   },
   {
     id: 14,
     title: "Show notification",
     description: 'To show notification to user. It requires 6 parameters, title for the notification, context text, summary text, notification icon, notification image, destination activity(activity to open when notification is clicked).',
+    note: "Starting from Android 13 (SDK 33/TIRAMISU), it requires the `android.permission.POST_NOTIFICATIONS` permission.",
     code: '.showNotification("Test Notification","Test Content","Test Summary","","","in.workindia.rapidwebviewandroidsample.MainActivity"',
   },
   {
@@ -108,20 +112,25 @@ const FUNCTION_DOCS = [
   {
     id: 16,
     title: "Open native file upload interface",
-    description: 'To upload a file using native file upload interface. It accepts 3 parameters, the file type, upload Url(where the file will be uploaded), and third a method to either "PUT" or "POST", Callbacks from native can be used by using javascript event listener with the event "rapid-web-view-upload-listener" which will return object { detail: { "status" : "success","uploadUrl" : "$uploadUrl","uploadFileName" : "$fileName"} }',
+    description: 'To upload a file using native file upload interface. It accepts 3 parameters, the file type, upload Url(where the file will be uploaded), and third a method to either "PUT" or "POST".',
+    event: 'Callbacks from native can be used by using javascript event listener with the event "rapid-web-view-upload-listener" which will return object { detail: { "status" : "success","uploadUrl" : "$uploadUrl","uploadFileName" : "$fileName"} }',
     code: '.uploadFile("doc", "www.example.com/uploadfile", "PUT|POST")',
   },
   {
     id: 17,
-    title: "Download file locally",
-    description: 'To download a file using native DownloadManager.It takes accepts 3 parameters: url (String?), which is the mandatory URL of the file to download; fileName (String?), an optional parameter for specifying the name of the saved file, defaulting to a lastSegment or the url if not provided; and downloadLocation (String?), which determines the save location and can be "EXTERNAL_FILES"(app specific storage accessible for other apps), or "PUBLIC_DOWNLOADS", with a default to the public Downloads directory. If the required WRITE_EXTERNAL_STORAGE permission is not granted, the function will trigger an activity to request the permission before proceeding with the download.',
-    code: '.downLoadFileLocally("https://sample-videos.com/doc/Sample-doc-file-2000kb.doc","file.doc","PUBLIC_DOWNLOADS")'
+    title: "Download a File Locally",
+    description: `Downloads a file using the native DownloadManager. This function accepts three parameters: \`url\` (String), the mandatory URL of the file to download; \`fileName\` (String), an optional parameter that specifies the name of the saved file, defaulting to the last segment of the URL if not provided; and \`downloadLocation\` (String), which specifies the save location. \`downloadLocation\` can be 'EXTERNAL_FILES' (app-specific storage) or 'PUBLIC_DOWNLOADS' (default).`,
+    event: "Callbacks from native can be used by using javascript event listener with the event `rapid-web-view-download-listener` which will return object `{ detail: { eventKey: \"downloadCompleted\", status: \"success|failure\", downloadId: \"downloadId\" } }`.",
+    note: 'On devices running Android 9 (API level 28) or lower, ensure the WRITE_EXTERNAL_STORAGE permission is granted.',
+    code: '.downLoadFileLocally("https://example_files/example.pdf","example.pdf","PUBLIC_DOWNLOADS")'
   },
   {
     id: 18,
-    title: "Download locally and Open the file",
-    description: 'To download and Open the file using native DownloadManager.It takes accepts 3 parameters: url (String?), which is the mandatory URL of the file to download; fileName (String?), an optional parameter for specifying the name of the saved file, defaulting to a lastSegment or the url if not provided; and downloadLocation (String?), which determines the save location and can be "EXTERNAL_FILES"(app specific storage accessible for other apps), or "PUBLIC_DOWNLOADS", with a default to the public Downloads directory. If the required WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE permissions are not granted, the function will trigger an activity to request the permission before proceeding with the download.',
-    code: '.downLoadAndOpenFile("https://sample-videos.com/doc/Sample-doc-file-2000kb.doc","file.doc","EXTERNAL_FILES")'
+    title: "Download and Open a File",
+    description: "Downloads a file and opens it using the native DownloadManager. This function accepts three parameters: `url` (String), the mandatory URL of the file to download; `fileName` (String), an optional parameter that specifies the name of the saved file, defaulting to the last segment of the URL if not provided; and `downloadLocation` (String), which specifies the save location. `downloadLocation` can be 'EXTERNAL_FILES' (app-specific storage) or 'PUBLIC_DOWNLOADS' (default).",
+    event: "Callbacks from native can be used by using javascript event listener with the event `rapid-web-view-download-listener` which will return object `{ detail: { eventKey: \"downloadCompleted|downloadUnsuccessful|packageNotFound\", status: \"success|failure\", downloadId: \"downloadId\" } }`.",
+    note: "For devices running Android 9 (API level 28) or lower, ensure both WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE permissions are granted.",
+    code: '.downLoadAndOpenFile("https://picsum.photos/200/300","example.png","EXTERNAL_FILES")'
   },
 ];
 
@@ -129,6 +138,8 @@ const FunctionDocItem = (item: {
   id: number;
   title: string;
   description: string;
+  event?: string;
+  note?: string;
   code: string;
 }) => {
   return (
@@ -139,6 +150,15 @@ const FunctionDocItem = (item: {
       <Text fontSize={"md"} color={"gray.600"}>
         {item.description}
       </Text>
+      {
+        item.event && <Text marginTop={"1"} fontSize={"sm"} color={"gray.600"}>
+          <strong>Events: </strong>{item.event}
+        </Text>
+      }
+      { item.note && <Text marginTop={"1"} fontSize={"sm"} color={"gray.600"}>
+          <strong>Note: </strong>{item.note}
+        </Text>
+      }
       <Code
         display={"block"}
         p={"4"}

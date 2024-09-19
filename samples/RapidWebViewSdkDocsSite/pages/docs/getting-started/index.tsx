@@ -177,6 +177,33 @@ const GettingStarted: NextPage = () => {
               </NLink>
             </Text>
 
+            <Heading fontSize={"lg"} mb={"3"} mt={"6"}>
+              Permissions{" "}
+              <Text
+                fontSize={"md"}
+                fontWeight={"400"}
+                color={"gray.600"}
+                display={"inline-flex"}
+              >
+                (optional)
+              </Text>
+            </Heading>
+
+            <Text fontSize={"md"} color={"gray.600"} mb={"3"}>
+              In order to support certain functionalities within JavascriptInterface, you may add following permissions to your AndroidManifest.xml.
+              <Code
+                display={"block"}
+                p={"4"}
+                my={"2"}
+                whiteSpace={"pre"}
+                overflowX={"scroll"}
+                style={{ tabSize: 2 }}
+              >
+                {
+                  ` <uses-permission android:name="android.permission.CALL_PHONE" /> \n <uses-permission android:name="android.permission.VIBRATE" /> \n <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  \n <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />  \n <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />`
+                }
+              </Code>
+            </Text>
             <Text fontSize={"lg"} mt={"6"} mb={"4"}>
               Next: Setup a web app which uses WebPack.{" "}
               <NLink href={"/docs/getting-started/webapp"}>

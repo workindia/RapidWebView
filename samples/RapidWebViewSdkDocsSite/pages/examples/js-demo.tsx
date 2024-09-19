@@ -29,7 +29,7 @@ const demoItems = [
     link: "/docs/js-interface/functions#1",
     onClick: () => {
       // @ts-ignore
-      app.vibrate(200);
+      app.vibrate(1100);
     },
   },
   {
@@ -193,6 +193,15 @@ const demoItems = [
     link: "/docs/js-interface/functions#14",
     onClick: () => {
       // @ts-ignore
+      if (app.getAndroidSDKVersion() >= 33 && !app.checkForPermission(["android.permission.POST_NOTIFICATIONS"])) {
+        // @ts-ignore
+        app.requestPermissions(
+          ["android.permission.POST_NOTIFICATIONS"],
+          "Permission required to show notifications"
+        );
+        return 
+      }
+      // @ts-ignore
       app.showNotification(
         "Test Notification",
         "Test Content",
@@ -220,27 +229,53 @@ const demoItems = [
     link: "/docs/js-interface/functions#16",
     onClick: () => {
       // @ts-ignore
-      app.uploadFile("doc","https://google.com/pagead/form-data/1039234079?gtm=45be48s0v9166926293za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=0&npa=0&frm=0&auid=1101065353.1725344348&uaa=arm&uab=64&uafvl=Chromium%3B128.0.6613.113%7CNot%253BA%253DBrand%3B24.0.0.0%7CGoogle%2520Chrome%3B128.0.6613.113&uamb=0&uam=&uap=macOS&uapv=14.6.1&uaw=0","PUT");
+      app.uploadFile("doc","https://google.com/pagead/form-data/1039234079","PUT");
     },
   },
   {
     id: 17,
     title: "Download file locally",
-    description: "downLoadFileLocally(url: String, fileName: String?, downloadLocation: String?)",
+    description: "downloadFileLocally(url: String, fileName: String?, downloadLocation: String?)",
     link: "/docs/js-interface/functions#17",
     onClick: () => {
+      const downloadLocation = "PUBLIC_DOWNLOADS"
       // @ts-ignore
-      app.downLoadFileLocally("https://s29.q4cdn.com/175625835/files/doc_downloads/test.pdf","","PUBLIC_DOWNLOADS");
+      if (app.getAndroidSDKVersion() <= 28 && downloadLocation == "PUBLIC_DOWNLOADS" && app.checkForPermission([
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+      ]) == false) {
+        // @ts-ignore
+        app.requestPermissions(
+          ["android.permission.WRITE_EXTERNAL_STORAGE"],
+          "Storage permission is required for downloading files"
+        );
+        return 
+      }else{
+        // @ts-ignore
+        app.downloadFileLocally("https://s29.q4cdn.com/175625835/files/doc_downloads/test.pdf","",downloadLocation);
+      }
     },
   },
   {
     id: 18,
     title: "Download locally and Open the file",
-    description: "downLoadAndOpenFile(url: String, fileName: String?, downloadLocation: String?)",
+    description: "downloadFileLocallyAndOpen(url: String, fileName: String?, downloadLocation: String?)",
     link: "/docs/js-interface/functions#18",
     onClick: () => {
+      const downloadLocation = "PUBLIC_DOWNLOADS"
       // @ts-ignore
-      app.downLoadAndOpenFile("https://s29.q4cdn.com/175625835/files/doc_downloads/test.pdf","","PUBLIC_DOWNLOADS");
+      if (app.getAndroidSDKVersion() <= 28 && downloadLocation == "PUBLIC_DOWNLOADS" && app.checkForPermission([
+        "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.READ_EXTERNAL_STORAGE"
+      ]) == false) {
+        // @ts-ignore
+        app.requestPermissions(
+          ["android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.READ_EXTERNAL_STORAGE"],
+          "Storage permission is required for downloading files"
+        );
+        return 
+      }else{
+        // @ts-ignore
+        app.downloadFileLocallyAndOpen("https://picsum.photos/200/300","",downloadLocation);
+      }
     },
   }
 ];
@@ -250,7 +285,6 @@ const demoItems = [
 Pending examples:
 - openShareIntent(shareText: String, shareImage: String)
 - shareToApp(packageName: String, shareText: String, shareImage: String)
-- uploadFile(fileType: String, uploadUrl: String, callback: String?)
 - storeInAppCache(fileUrl: String)
 - checkForFileInCache(fileUrl: String)
 */
@@ -313,12 +347,77 @@ const jsCompatible = (): boolean => {
   return typeof app === "object";
 };
 
+type PermissionResultEventObject = {
+  detail: {
+    status: string;
+    permissionList: string;
+  }
+}
+
+type DownloadCompletionEventObject = {
+  detail: {
+    eventKey: string;
+    status: string;
+    downloadId?: string;
+    detail?: string;
+  }
+}
+
+
+type UploadCompletionEventObject = {
+  detail: {
+    status: string;
+    uploadUrl: string;
+    uploadFileName: string;
+  }
+}
+
+
 const JSDemo: NextPage = () => {
   const [jsInterfaceState, setJsInterfaceState] = useState(false);
 
   useEffect(() => {
     setJsInterfaceState(jsCompatible());
   }, []);
+
+  const permissionResultEventListener = (event: PermissionResultEventObject) => {
+    // @ts-ignore
+    app.showToast(`Permission ${event.detail.permissionList} ${event.detail.status === "success" ? "Granted" : "Denied"}`,0)
+  }
+
+  const downloadCompletionEventLisetner = (event: DownloadCompletionEventObject) => {
+    // @ts-ignore
+    switch (event.detail.eventKey) {
+      case "downloadCompleted": 
+      // @ts-ignore
+        app.showToast(`download completed.`,0);
+        break;
+      case "downloadUnSuccessful":
+      // @ts-ignore
+        app.showToast(`download unSucessful.`,0)
+      case "packageNotFound":
+        // @ts-ignore
+          app.showToast(`can't open file, no viewer application found.`,0)
+      default:
+        break;
+    }
+  }
+  
+  const uploadCompletionEventListener = (event: UploadCompletionEventObject) => {
+    // @ts-ignore
+    app.showToast(`${event.detail.status === "success" ? `${event.detail.uploadFileName} uploaded successfully`: "upload failed"}`,0);
+  }
+  
+  useEffect(() => {
+    window.addEventListener("rapid-web-view-permission-listener",permissionResultEventListener as unknown as EventListener)
+    window.addEventListener("rapid-web-view-download-listener",downloadCompletionEventLisetner as unknown as EventListener)
+    window.addEventListener("rapid-web-view-upload-listener",uploadCompletionEventListener as unknown as EventListener)
+    return () => {
+      window.removeEventListener("rapid-web-view-download-listener",permissionResultEventListener as unknown as EventListener)
+      window.removeEventListener("rapid-web-view-download-listener",downloadCompletionEventLisetner as unknown as EventListener)
+      window.removeEventListener("rapid-web-view-upload-listener",uploadCompletionEventListener as unknown as EventListener)
+    }
+  }, [])
 
   return (
     <>
