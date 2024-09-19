@@ -8,35 +8,37 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.widget.Toast
+import android.webkit.WebView
 import androidx.core.content.FileProvider
-import `in`.workindia.rapidwebview.datamodels.DownloadLocation
 import `in`.workindia.rapidwebview.R
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.EVENT_DOWNLOAD_LISTENER
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.EVENT_KEY
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.FAILURE
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_DETAIL
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_DOWNLOAD_UNSUCCESSFUL
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_PACKAGE_NOT_FOUND
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PROVIDER_SUFFIX
-import `in`.workindia.rapidwebview.utils.Utils.validateUrl
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.STATUS
+import `in`.workindia.rapidwebview.datamodels.DownloadLocation
 import java.io.File
 
-object RapidDownLoadUtility {
+object DownLoadUtility {
 
     /**
-     * Starts a download using the system's `DownloadManager`.
+     * Downloads a file from the given URL to a specified local directory.
      *
-     * @param url The URL from which the file is to be downloaded. Must be a valid URL.
+     * @param url The URL of the file to be downloaded.
      * @param context The context, used to access system services.
-     * @param fileName The name of the file to be downloaded. If null, the name will be extracted from the URL. Defaults to null.
-     * @param downloadLocation The location where the file will be saved. Defaults to [DownloadLocation.PUBLIC_DOWNLOADS].
+     * @param fileName The name of the file to be saved locally after download, including the file extension. Default value: Last segment of the URL
+     * @param downloadLocation The location where the file will be saved. Defaults value: [DownloadLocation.PUBLIC_DOWNLOADS].
      * @return `true` if the download was successfully initiated, `false` otherwise.
      */
     fun startDownload(
-        url: String?,
         context: Context,
+        url: String,
         fileName: String? = null,
         downloadLocation: DownloadLocation = DownloadLocation.PUBLIC_DOWNLOADS,
     ): Boolean {
-        validateUrl(url) {
-            return false
-        }
-
         try {
             val uri = Uri.parse(url)
             val request = DownloadManager.Request(uri)
@@ -47,7 +49,7 @@ object RapidDownLoadUtility {
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
 
-            setDownloadDestination(downloadLocation, validFileName, context, request)
+            setDownloadDestination(context, request, downloadLocation, validFileName)
 
             val downloadManager =
                 context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -59,31 +61,31 @@ object RapidDownLoadUtility {
     }
 
     /**
-     * Sets the destination for the download based on the specified download location.
+     * Sets the destination for the download request on the specified download location.
      *
      * @param downloadLocation The location where the file will be saved.
-     * @param validFileName The valid filename to be used for saving the file.
+     * @param fileName The valid filename to be used for saving the file.
      * @param context The context, used to access system services.
      * @param request The download request to which the destination is being set.
      */
-    private fun setDownloadDestination(
-        downloadLocation: DownloadLocation,
-        validFileName: String,
+    private inline fun setDownloadDestination(
         context: Context,
         request: DownloadManager.Request,
+        downloadLocation: DownloadLocation,
+        fileName: String,
     ) {
         when (downloadLocation) {
             DownloadLocation.EXTERNAL_FILES -> {
                 request.setDestinationInExternalFilesDir(
                     context,
-                    Environment.DIRECTORY_DOWNLOADS, validFileName
+                    Environment.DIRECTORY_DOWNLOADS, fileName
                 )
             }
 
             DownloadLocation.PUBLIC_DOWNLOADS -> {
                 request.setDestinationInExternalPublicDir(
                     Environment.DIRECTORY_DOWNLOADS,
-                    validFileName
+                    fileName
                 )
             }
         }
@@ -94,9 +96,10 @@ object RapidDownLoadUtility {
      * Opens a downloaded file using the system's default viewer based on the file's MIME type.
      *
      * @param context The context used to access system services and start activities.
+     * @param webView The WebView used to dispatch appropriate events.
      * @param downloadId The ID of the download to be opened, obtained from the download manager.
      */
-    fun openDownLoadedFile(context: Context, downloadId: Long) {
+    fun openFileFromDownloads(context: Context, webView: WebView, downloadId: Long) {
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val query = DownloadManager.Query().setFilterById(downloadId)
 
@@ -113,11 +116,22 @@ object RapidDownLoadUtility {
                     val downloadMimeType = cursor.getString(mimeTypeIndex)
 
                     if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL && !downloadLocalUri.isNullOrBlank()) {
-                        openDownloadedAttachment(
+                        openFile(
                             context,
+                            webView,
                             Uri.parse(downloadLocalUri),
                             downloadMimeType
                         )
+                    } else {
+                        val downloadUnSuccessfulEvent = LocalBroadCastActionUtility.generateJavaScriptEvent(
+                            EVENT_DOWNLOAD_LISTENER,
+                            mapOf(
+                                EVENT_KEY to KEY_DOWNLOAD_UNSUCCESSFUL,
+                                STATUS to FAILURE,
+                                KEY_DETAIL to "Download with downloadId $downloadId was unsuccessful"
+                            )
+                        )
+                        LocalBroadCastActionUtility.dispatchJavaScript(downloadUnSuccessfulEvent, webView)
                     }
                 }
             }
@@ -125,14 +139,16 @@ object RapidDownLoadUtility {
     }
 
     /**
-     * Opens a downloaded file attachment using an appropriate app based on its MIME type.
+     * Opens a file attachment using an appropriate app based on its MIME type.
      *
      * @param context The context used to start the activity for viewing the file.
-     * @param attachmentUri The URI of the downloaded file to be opened.
+     * @param webView The WebView used to dispatch appropriate events.
+     * @param attachmentUri The URI of the file to be opened.
      * @param attachmentMimeType The MIME type of the downloaded file.
      */
-    private fun openDownloadedAttachment(
+    private fun openFile(
         context: Context,
+        webView: WebView,
         attachmentUri: Uri,
         attachmentMimeType: String,
     ) {
@@ -159,7 +175,15 @@ object RapidDownLoadUtility {
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, context.resources.getString(R.string.cannot_open_file), Toast.LENGTH_SHORT).show()
+            val activityNotFoundEvent = LocalBroadCastActionUtility.generateJavaScriptEvent(
+                EVENT_DOWNLOAD_LISTENER,
+                mapOf(
+                    EVENT_KEY to KEY_PACKAGE_NOT_FOUND,
+                    STATUS to FAILURE,
+                    KEY_DETAIL to "Package not found for opening file type $attachmentMimeType"
+                )
+            )
+            LocalBroadCastActionUtility.dispatchJavaScript(activityNotFoundEvent, webView)
         }
     }
 }

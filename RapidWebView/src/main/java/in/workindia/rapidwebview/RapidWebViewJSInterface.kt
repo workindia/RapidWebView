@@ -18,7 +18,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.text.TextUtils
@@ -34,15 +33,10 @@ import `in`.workindia.rapidwebview.activities.UploadFileActivity
 import `in`.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader
 import `in`.workindia.rapidwebview.assetcache.RapidStorageUtility
 import `in`.workindia.rapidwebview.constants.BroadcastConstants
-import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.DOWNLOAD_LOCATION
-import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.DOWNLOAD_URL
-import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.FILE_NAME
-import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMISSION_LIST_INTENT
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMISSION_LIST_KEY
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.RATIONAL_TEXT
-import `in`.workindia.rapidwebview.datamodels.DownloadLocation
-import `in`.workindia.rapidwebview.utils.RapidBrodCastActionUtility
-import `in`.workindia.rapidwebview.utils.RapidDownLoadUtility
-import `in`.workindia.rapidwebview.utils.RapidPermissionHelper
+import `in`.workindia.rapidwebview.utils.DownLoadUtility
+import `in`.workindia.rapidwebview.utils.LocalBroadCastActionUtility
 import `in`.workindia.rapidwebview.utils.Utils
 import org.json.JSONException
 import org.json.JSONObject
@@ -55,7 +49,7 @@ import pub.devrel.easypermissions.EasyPermissions
 open class RapidWebViewJSInterface(
     private val context: Context,
     private val activity: Activity,
-    private val webView: WebView
+    private val webView: WebView,
 ) {
 
     /**
@@ -69,29 +63,8 @@ open class RapidWebViewJSInterface(
      *
      */
     private val broadcastReceiverForNativeCallbacks: BroadcastReceiver =
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent) {
-                when (intent.action) {
-                    BroadcastConstants.NATIVE_CALLBACK_ACTION -> RapidBrodCastActionUtility.handleNativeCallbackAction(
-                        intent,
-                        webView,
-                        context
-                    )
-                }
-            }
-        }
-
-    /**
-     * BroadCastReceiver to handle download complete action [DownloadManager.ACTION_DOWNLOAD_COMPLETE].
-     */
-    private val broadcastReceiverForDownloadCompleteAction: BroadcastReceiver =
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent?.action == DownloadManager.ACTION_DOWNLOAD_COMPLETE) {
-                    RapidBrodCastActionUtility.handleDownloadCompleteAction(context, intent)
-                    context?.unregisterReceiver(this)
-                }
-            }
+        LocalBroadCastActionUtility.createReceiver(BroadcastConstants.NATIVE_CALLBACK_ACTION) { _, intent, _ ->
+            LocalBroadCastActionUtility.handleNativeCallbackAction(webView, intent)
         }
 
     init {
@@ -99,7 +72,21 @@ open class RapidWebViewJSInterface(
         val intentFilter = IntentFilter()
         intentFilter.addAction(BroadcastConstants.NATIVE_CALLBACK_ACTION)
         bManager.registerReceiver(broadcastReceiverForNativeCallbacks, intentFilter)
+
+        val downloadCompletionReceiver: BroadcastReceiver =
+            LocalBroadCastActionUtility.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, _ ->
+                LocalBroadCastActionUtility.dispatchDownloadCompletionEvent(webView, intent)
+            }
+
+        LocalBroadCastActionUtility.registerReceiver(
+            context,
+            downloadCompletionReceiver,
+            IntentFilter().apply {
+                addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+            }
+        )
     }
+
 
     /**
      * Start any activity within the application
@@ -125,9 +112,11 @@ open class RapidWebViewJSInterface(
                     value is Int -> {
                         intent.putExtra(key, value)
                     }
+
                     value is String -> {
                         intent.putExtra(key, value)
                     }
+
                     value is Boolean -> {
                         intent.putExtra(key, value)
                     }
@@ -195,6 +184,7 @@ open class RapidWebViewJSInterface(
      * Vibrate device
      * @param durationMs: vibrate duration in milliseconds
      */
+    @Suppress("MissingPermission")
     @JavascriptInterface
     fun vibrate(durationMs: Long = 500) {
         val vibrator = context
@@ -487,8 +477,8 @@ open class RapidWebViewJSInterface(
     fun requestPermissions(permissions: Array<String>, rationaleText: String) {
         val intent = Intent(activity, PermissionActivity::class.java)
 
-        intent.putExtra("permissionList", permissions)
-        intent.putExtra("rationalText", rationaleText)
+        intent.putExtra(PERMISSION_LIST_KEY, permissions)
+        intent.putExtra(RATIONAL_TEXT, rationaleText)
 
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
@@ -536,15 +526,15 @@ open class RapidWebViewJSInterface(
     }
 
     /**
-     * Show notification
-     * need [Manifest.permission.POST_NOTIFICATIONS] since [Build.VERSION_CODES.TIRAMISU]
+     * Displays a notification to the user. Requires [Manifest.permission.POST_NOTIFICATIONS] from [Build.VERSION_CODES.TIRAMISU].
+     * The caller must ensure that the appropriate permissions are present before calling this method
      *
-     * @param title Title of notification
-     * @param contentText Text of notification
-     * @param summaryText Summary of notification
-     * @param notificationIcon Name of image to be displayed in notification
-     * @param notificationImage Name of image to be displayed in expanded notification
-     * @param destActivity Name of activity to navigate to after notification is clicked
+     * @param title Title of the notification.
+     * @param contentText The content text of the notification.
+     * @param summaryText Summary text for the notification (optional).
+     * @param notificationIcon Resource name of the image used as the notification icon.
+     * @param notificationImage Resource name of the image used in the expanded notification.
+     * @param destActivity Name of the activity to navigate to when the notification is clicked.
      */
     @JavascriptInterface
     fun showNotification(
@@ -553,14 +543,8 @@ open class RapidWebViewJSInterface(
         summaryText: String?,
         notificationIcon: String,
         notificationImage: String,
-        destActivity: String
+        destActivity: String,
     ) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !checkForPermission(arrayOf(Manifest.permission.POST_NOTIFICATIONS))){
-            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS),context.resources.getString(R.string.permission_required))
-            return
-        }
-
         val mBuilder = NotificationCompat.Builder(
             context.applicationContext,
             RapidWebViewNotificationHelper.getChannelId(
@@ -638,74 +622,106 @@ open class RapidWebViewJSInterface(
     }
 
     /**
-     * Downloads file locally from the given url after checking for required permissions
-     *
-     * @see RapidPermissionHelper.requiredPermissionsForReadAndWrite
-     * @see requestPermissions
-     *
-     * Listen for Events from PermissionActivity through broadcast receiver supported events are:
-     * "rapid-web-view-permission-listener" : { detail: { status: "success|failure", permissionList: "permission1, permission2" } }
-     * @see broadcastReceiverForNativeCallbacks
-     *
-     * @param url Url of file to download
-     * @param fileName Name of file to be saved after downloading( fileName should include mimeType Eg: example-file.pdf ) , Default value is last segment from the url.
-     * @param downloadLocation [DownloadLocation] Directory where to download the file accepted values are "PUBLIC_DOWNLOADS", "EXTERNAL_FILES"
+     * Get current Android SDK version
      */
     @JavascriptInterface
-    fun downLoadFileLocally(
-        url: String?,
-        fileName: String? = null,
-        downloadLocation: String? = DownloadLocation.PUBLIC_DOWNLOADS.name,
-    ) {
-        Utils.validateUrl(url) {
-            return
-        }
-
-        val requiredPermissions = RapidPermissionHelper.requiredPermissionsForReadAndWrite()
-        val validDownloadLocation = Utils.toDownloadLocation(downloadLocation)
-
-        if (checkForPermission(requiredPermissions)) {
-            RapidDownLoadUtility.startDownload(url, context, fileName, validDownloadLocation)
-        } else {
-            val intent = Intent(activity, PermissionActivity::class.java)
-
-            intent.putExtra(PERMISSION_LIST_INTENT, requiredPermissions)
-            intent.putExtra(RATIONAL_TEXT, context.resources.getString(R.string.permission_required))
-
-            intent.putExtras(Bundle().apply {
-                putString(DOWNLOAD_URL, url)
-                putString(FILE_NAME, fileName)
-                putString(DOWNLOAD_LOCATION, validDownloadLocation.name)
-            })
-
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
-        }
+    fun getAndroidSDKVersion(): Int {
+        return Build.VERSION.SDK_INT
     }
 
     /**
-     * Download the file from the given url after checking for required permissions and Opens it.
-     * Uses Global BrodCast Receiver to handle download complete action. requires API 26+ for Opening the file.
+     * Downloads a file from the given URL to a specified local directory.
      *
-     * @param url Url of file to download
-     * @param fileName Name of file to be saved after downloading( fileName should include mimeType Eg: example-file.pdf ) , Default value is last segment from the url.
-     * @param downloadLocation [DownloadLocation] Directory where to download the file accepted values are "PUBLIC_DOWNLOADS", "EXTERNAL_FILES"
+     * This method downloads a file from the provided `url` and saves it locally with the given `fileName`
+     * in the specified `downloadLocation`.
+     * In addition, the method fires a JavaScript event to notify the WebView of the download status.
      *
-     * @see downLoadFileLocally
+     * **Event Dispatch:**
+     * - On download completion, fires a `rapid-web-view-download-listener` event with the payload:
+     *     `{ detail: { eventKey: "downloadCompleted", status: "success|failure", downloadId: "downloadId" } }`
+     *
+     * **Note:**
+     * - Requires [Manifest.permission.WRITE_EXTERNAL_STORAGE] permission on devices running Android 9 (Pie, API 28) or lower for downloading to public storage directories.
+     *
+     * @param url The URL of the file to be downloaded.
+     *     - **Expected format:** A valid URL (e.g., https://example.com/sample.pdf).
+     *
+     * @param fileName The name of the file to be saved locally after download, including the file extension.
+     *     - **Example:** "example-file.pdf".
+     *     - **Default behavior:** If not provided, the last segment of the URL will be used as the file name.
+     *     - **Note:** Ensure that the provided file name includes the appropriate MIME type (e.g., `.pdf`, `.png`, etc.).
+     *
+     * @param downloadLocation The location where the file will be saved on the device.
+     *     - **Accepted values:**
+     *         - `"PUBLIC_DOWNLOADS"`: The file will be saved in the system's public Downloads directory.
+     *         - `"EXTERNAL_FILES"`: The file will be saved in the app's external files directory (specific to the app).
+     *     - **Default behavior:** If not provided, `"PUBLIC_DOWNLOADS"` is chosen.
+     *
      */
     @JavascriptInterface
-    fun downLoadAndOpenFile(
-        url: String?,
-        fileName: String? = null,
-        downloadLocation: String? = DownloadLocation.PUBLIC_DOWNLOADS.name,
+    fun downloadFileLocally(
+        url: String,
+        fileName: String,
+        downloadLocation: String
     ) {
+        val downloadLocationEnum = Utils.toDownloadLocation(downloadLocation)
+        DownLoadUtility.startDownload(context, url, fileName, downloadLocationEnum)
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            RapidPermissionHelper.registerDownLoadCompleteApi34(context,broadcastReceiverForDownloadCompleteAction)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            RapidPermissionHelper.registerDownLoadCompleteBase(context,broadcastReceiverForDownloadCompleteAction)
-        }
+    /**
+     * Downloads a file from the given URL and opens it upon completion.
+     *
+     * This method downloads the file using [downloadFileLocally],
+     * and automatically opens it once the download is complete. A global broadcast receiver listens for the
+     * `DownloadManager.ACTION_DOWNLOAD_COMPLETE` broadcast and triggers the file opening action.
+     *  In addition, the method fires a JavaScript event to notify the WebView of the download status.
+     *
+     * **Event Dispatch:**
+     * - On download completion, fires a `rapid-web-view-download-listener` event with the payload:
+     *     `{ detail: { eventKey: "downloadCompleted|downloadUnSuccessful|packageNotFound", status: "success|failure", downloadId: "downloadId" } }`
+     *
+     * **Note:**
+     * - Requires Android 8.0 (API level 26) or higher to open the downloaded file.
+     * - For Android versions before API 26, the file will be downloaded, but the automatic opening functionality will not work.
+     * - This method uses a global broadcast receiver to handle the download completion action and unregisters the receiver afterward.
+     * - Requires [Manifest.permission.WRITE_EXTERNAL_STORAGE] permission on devices running Android 9 (Pie, API 28) or lower for downloading to public storage directories.
+     * - Requires [Manifest.permission.READ_EXTERNAL_STORAGE] permission on devices running Android 9 (Pie, API 28) or lower for opening the downloaded file.
+     *
+     * @param url The URL of the file to be downloaded.
+     *     - **Expected format:** A valid URL (e.g., https://example.com/sample.pdf).
+     *
+     * @param fileName The name of the file to be saved locally after download, including the file extension.
+     *     - **Example:** "example-file.pdf".
+     *     - **Default behavior:** If not provided, the last segment of the URL will be used as the file name.
+     *     - **Note:** Ensure that the provided file name includes the appropriate MIME type (e.g., `.pdf`, `.png`, etc.).
+     *
+     * @param downloadLocation The location where the file will be saved on the device.
+     *     - **Accepted values:**
+     *         - `"PUBLIC_DOWNLOADS"`: The file will be saved in the system's public Downloads directory.
+     *         - `"EXTERNAL_FILES"`: The file will be saved in the app's external files directory (specific to the app).
+     *     - **Default behavior:** If not provided, `"PUBLIC_DOWNLOADS"` is chosen.
+     *
+     * @see downloadFileLocally
+     */
+    @JavascriptInterface
+    fun downloadFileLocallyAndOpen(
+        url: String,
+        fileName: String,
+        downloadLocation: String,
+    ) {
+        val openFileReceiver =
+            LocalBroadCastActionUtility.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, receiver ->
+                val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
+                if (downloadId != -1L) {
+                    DownLoadUtility.openFileFromDownloads(context, webView, downloadId)
+                }
+                context.unregisterReceiver(receiver)
+            }
 
-        downLoadFileLocally(url, fileName, downloadLocation)
+        LocalBroadCastActionUtility.registerReceiver(context, openFileReceiver, IntentFilter().apply {
+            addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        })
+
+        downloadFileLocally(url, fileName, downloadLocation)
     }
 }
