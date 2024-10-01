@@ -131,7 +131,7 @@ const FUNCTION_DOCS = [
     description: "Downloads a file and opens it using the native DownloadManager. This function accepts three parameters: `url` (String), the mandatory URL of the file to download; `fileName` (String), an optional parameter that specifies the name of the saved file, defaulting to the last segment of the URL if not provided; and `downloadLocation` (String), which specifies the save location. `downloadLocation` can be 'EXTERNAL_FILES' (app-specific storage) or 'PUBLIC_DOWNLOADS' (default).",
     event: "Callbacks from native can be used by using javascript event listener with the event `rapid-web-view-download-listener` which will return object `{ detail: { eventKey: \"downloadCompleted|downloadUnsuccessful|packageNotFound\", status: \"success|failure\", downloadId: \"downloadId\" } }`.",
     note: "For devices running Android 9 (API level 28) or lower, ensure both WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE permissions are granted.",
-    code: '.downLoadAndOpenFile("https://picsum.photos/200/300","example.png","EXTERNAL_FILES")'
+    code: '.downloadFileLocallyAndOpenIntent("https://picsum.photos/200/300","example.png","EXTERNAL_FILES")'
   },
 ];
 

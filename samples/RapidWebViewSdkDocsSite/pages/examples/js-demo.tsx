@@ -258,7 +258,7 @@ const demoItems = [
   {
     id: 18,
     title: "Download locally and Open the file",
-    description: "downloadFileLocallyAndOpen(url: String, fileName: String?, downloadLocation: String?)",
+    description: "downloadFileLocallyAndOpenIntent(url: String, fileName: String?, downloadLocation: String?)",
     link: "/docs/js-interface/functions#18",
     onClick: () => {
       const downloadLocation = "PUBLIC_DOWNLOADS"
@@ -274,7 +274,7 @@ const demoItems = [
         return 
       }else{
         // @ts-ignore
-        app.downloadFileLocallyAndOpen("https://picsum.photos/200/300","",downloadLocation);
+        app.downloadFileLocallyAndOpenIntent("https://picsum.photos/200/300","",downloadLocation);
       }
     },
   }
