@@ -22,7 +22,7 @@ import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.STATUS
 import `in`.workindia.rapidwebview.datamodels.DownloadLocation
 import java.io.File
 
-object DownLoadUtility {
+object DownloadUtility {
 
     /**
      * Downloads a file from the given URL to a specified local directory.
@@ -123,7 +123,7 @@ object DownLoadUtility {
                             downloadMimeType
                         )
                     } else {
-                        val downloadUnSuccessfulEvent = LocalBroadCastActionUtility.generateJavaScriptEvent(
+                        val downloadUnSuccessfulEvent = LocalBroadcastActionUtility.generateJavaScriptEvent(
                             EVENT_DOWNLOAD_LISTENER,
                             mapOf(
                                 EVENT_KEY to KEY_DOWNLOAD_UNSUCCESSFUL,
@@ -131,7 +131,7 @@ object DownLoadUtility {
                                 KEY_DETAIL to "Download with downloadId $downloadId was unsuccessful"
                             )
                         )
-                        LocalBroadCastActionUtility.dispatchJavaScript(downloadUnSuccessfulEvent, webView)
+                        LocalBroadcastActionUtility.dispatchJavaScript(downloadUnSuccessfulEvent, webView)
                     }
                 }
             }
@@ -175,7 +175,7 @@ object DownLoadUtility {
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            val activityNotFoundEvent = LocalBroadCastActionUtility.generateJavaScriptEvent(
+            val activityNotFoundEvent = LocalBroadcastActionUtility.generateJavaScriptEvent(
                 EVENT_DOWNLOAD_LISTENER,
                 mapOf(
                     EVENT_KEY to KEY_PACKAGE_NOT_FOUND,
@@ -183,7 +183,7 @@ object DownLoadUtility {
                     KEY_DETAIL to "Package not found for opening file type $attachmentMimeType"
                 )
             )
-            LocalBroadCastActionUtility.dispatchJavaScript(activityNotFoundEvent, webView)
+            LocalBroadcastActionUtility.dispatchJavaScript(activityNotFoundEvent, webView)
         }
     }
 }

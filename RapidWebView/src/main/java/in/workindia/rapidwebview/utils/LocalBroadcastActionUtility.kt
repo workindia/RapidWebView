@@ -14,7 +14,7 @@ import `in`.workindia.rapidwebview.events.DownloadCompletionEvent
 import `in`.workindia.rapidwebview.events.PermissionResultEvent
 import `in`.workindia.rapidwebview.events.UploadCompletionEvent
 
-object LocalBroadCastActionUtility {
+object LocalBroadcastActionUtility {
 
     fun createReceiver(
         action: String,

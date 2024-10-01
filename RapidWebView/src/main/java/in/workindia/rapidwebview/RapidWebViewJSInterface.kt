@@ -35,8 +35,8 @@ import `in`.workindia.rapidwebview.assetcache.RapidStorageUtility
 import `in`.workindia.rapidwebview.constants.BroadcastConstants
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMISSION_LIST_KEY
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.RATIONAL_TEXT
-import `in`.workindia.rapidwebview.utils.DownLoadUtility
-import `in`.workindia.rapidwebview.utils.LocalBroadCastActionUtility
+import `in`.workindia.rapidwebview.utils.DownloadUtility
+import `in`.workindia.rapidwebview.utils.LocalBroadcastActionUtility
 import `in`.workindia.rapidwebview.utils.Utils
 import org.json.JSONException
 import org.json.JSONObject
@@ -63,8 +63,8 @@ open class RapidWebViewJSInterface(
      *
      */
     private val broadcastReceiverForNativeCallbacks: BroadcastReceiver =
-        LocalBroadCastActionUtility.createReceiver(BroadcastConstants.NATIVE_CALLBACK_ACTION) { _, intent, _ ->
-            LocalBroadCastActionUtility.handleNativeCallbackAction(webView, intent)
+        LocalBroadcastActionUtility.createReceiver(BroadcastConstants.NATIVE_CALLBACK_ACTION) { _, intent, _ ->
+            LocalBroadcastActionUtility.handleNativeCallbackAction(webView, intent)
         }
 
     init {
@@ -74,11 +74,11 @@ open class RapidWebViewJSInterface(
         bManager.registerReceiver(broadcastReceiverForNativeCallbacks, intentFilter)
 
         val downloadCompletionReceiver: BroadcastReceiver =
-            LocalBroadCastActionUtility.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, _ ->
-                LocalBroadCastActionUtility.dispatchDownloadCompletionEvent(webView, intent)
+            LocalBroadcastActionUtility.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, _ ->
+                LocalBroadcastActionUtility.dispatchDownloadCompletionEvent(webView, intent)
             }
 
-        LocalBroadCastActionUtility.registerReceiver(
+        LocalBroadcastActionUtility.registerReceiver(
             context,
             downloadCompletionReceiver,
             IntentFilter().apply {
@@ -665,7 +665,7 @@ open class RapidWebViewJSInterface(
         downloadLocation: String
     ) {
         val downloadLocationEnum = Utils.toDownloadLocation(downloadLocation)
-        DownLoadUtility.startDownload(context, url, fileName, downloadLocationEnum)
+        DownloadUtility.startDownload(context, url, fileName, downloadLocationEnum)
     }
 
     /**
@@ -710,15 +710,15 @@ open class RapidWebViewJSInterface(
         downloadLocation: String,
     ) {
         val openFileReceiver =
-            LocalBroadCastActionUtility.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, receiver ->
+            LocalBroadcastActionUtility.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, receiver ->
                 val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
                 if (downloadId != -1L) {
-                    DownLoadUtility.openFileFromDownloads(context, webView, downloadId)
+                    DownloadUtility.openFileFromDownloads(context, webView, downloadId)
                 }
                 context.unregisterReceiver(receiver)
             }
 
-        LocalBroadCastActionUtility.registerReceiver(context, openFileReceiver, IntentFilter().apply {
+        LocalBroadcastActionUtility.registerReceiver(context, openFileReceiver, IntentFilter().apply {
             addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
         })
 
