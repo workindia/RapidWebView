@@ -51,25 +51,27 @@ open class RapidWebViewJSInterface(
     private val webView: WebView,
 ) {
 
-    /**
-     * BroadCastReceiver to update push data to the page loaded on RapidWebView. The receiver
-     * get certain events and performs actions based on event type. Data is pushed to website / page
-     * using webView.loadUrl method.
-     *
-     * Events supported:
-     * 1. File Upload success / failure
-     * 2. Permission request callback
-     *
-     */
-    private val broadcastReceiverForNativeCallbacks: BroadcastReceiver =
-        LocalBroadcastActionUtility.createReceiver(BroadcastConstants.NATIVE_CALLBACK_ACTION) { _, intent, _ ->
-            LocalBroadcastActionUtility.handleNativeCallbackAction(webView, intent)
-        }
 
     init {
         val bManager = LocalBroadcastManager.getInstance(context)
         val intentFilter = IntentFilter()
         intentFilter.addAction(BroadcastConstants.NATIVE_CALLBACK_ACTION)
+
+        /**
+         * BroadCastReceiver to update push data to the page loaded on RapidWebView. The receiver
+         * get certain events and performs actions based on event type. Data is pushed to website / page
+         * using webView.loadUrl method.
+         *
+         * Events supported:
+         * 1. File Upload success / failure
+         * 2. Permission request callback
+         *
+         */
+        val broadcastReceiverForNativeCallbacks: BroadcastReceiver =
+            LocalBroadcastActionUtility.createReceiver(BroadcastConstants.NATIVE_CALLBACK_ACTION) { _, intent, _ ->
+                LocalBroadcastActionUtility.handleNativeCallbackAction(webView, intent)
+            }
+
         bManager.registerReceiver(broadcastReceiverForNativeCallbacks, intentFilter)
 
         val downloadCompletionReceiver: BroadcastReceiver =
