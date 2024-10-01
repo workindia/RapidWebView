@@ -114,7 +114,7 @@ const FUNCTION_DOCS = [
     title: "Open native file upload interface",
     description: 'To upload a file using native file upload interface. It accepts 3 parameters, the file type, upload Url(where the file will be uploaded), and third a method to either "PUT" or "POST".',
     event: 'Callbacks from native can be used by using javascript event listener with the event "rapid-web-view-upload-listener" which will return object { detail: { "status" : "success","uploadUrl" : "$uploadUrl","uploadFileName" : "$fileName"} }',
-    note: 'as the method uses foreground service for uploading files, on Devices running Android 9 (SDK 29/Q) or above, it requires `android.permission.FOREGROUND_SERVICE` and `android.permission.FOREGROUND_SERVICE_DATA_SYNC` permissions',
+    note: 'As the method uses foreground service for uploading files, on Devices running Android 9 (SDK 29/Q) or above, it requires `android.permission.FOREGROUND_SERVICE` and `android.permission.FOREGROUND_SERVICE_DATA_SYNC` permissions.',
     code: '.uploadFile("doc", "www.example.com/uploadfile", "PUT|POST")',
   },
   {
