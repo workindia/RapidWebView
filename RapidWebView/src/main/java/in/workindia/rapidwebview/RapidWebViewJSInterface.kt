@@ -37,7 +37,6 @@ import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMIS
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.RATIONAL_TEXT
 import `in`.workindia.rapidwebview.utils.DownloadUtility
 import `in`.workindia.rapidwebview.utils.LocalBroadcastActionUtility
-import `in`.workindia.rapidwebview.utils.Utils
 import org.json.JSONException
 import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
@@ -664,7 +663,7 @@ open class RapidWebViewJSInterface(
         fileName: String,
         downloadLocation: String
     ) {
-        val downloadLocationEnum = Utils.toDownloadLocation(downloadLocation)
+        val downloadLocationEnum = DownloadUtility.toDownloadLocation(downloadLocation)
         DownloadUtility.startDownload(context, url, fileName, downloadLocationEnum)
     }
 

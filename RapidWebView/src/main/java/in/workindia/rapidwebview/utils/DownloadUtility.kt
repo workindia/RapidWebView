@@ -42,7 +42,7 @@ object DownloadUtility {
         try {
             val uri = Uri.parse(url)
             val request = DownloadManager.Request(uri)
-            val validFileName = Utils.getFileNameFromUri(fileName, uri)
+            val validFileName = getFileNameFromUri(fileName, uri)
 
             request.setTitle(validFileName)
             request.setDescription(context.resources.getString(R.string.downloading_file))
@@ -184,6 +184,29 @@ object DownloadUtility {
                 )
             )
             LocalBroadcastActionUtility.dispatchJavaScript(activityNotFoundEvent, webView)
+        }
+    }
+
+    /**
+     *  @return fileName if valid String otherwise return lastPathSegment of uri
+     */
+    private fun getFileNameFromUri(fileName: String?, uri: Uri): String {
+        return if (fileName.isNullOrBlank()) {
+            uri.lastPathSegment ?: "file"
+        } else {
+            fileName
+        }
+    }
+
+    /**
+     *  @return [DownloadLocation] returns matching value from [DownloadLocation] enum.
+     *  Default value is [DownloadLocation.PUBLIC_DOWNLOADS]
+     */
+    fun toDownloadLocation(location: String): DownloadLocation {
+        return try {
+            DownloadLocation.valueOf(location)
+        } catch (e: IllegalArgumentException) {
+            DownloadLocation.PUBLIC_DOWNLOADS
         }
     }
 }
