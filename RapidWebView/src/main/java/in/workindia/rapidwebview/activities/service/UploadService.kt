@@ -112,7 +112,7 @@ class UploadService : Service() {
 
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> startForeground(90, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> startForeground(90,notification)
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> startForeground(90, notification)
         }
     }
 
