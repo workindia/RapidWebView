@@ -200,7 +200,7 @@ const GettingStarted: NextPage = () => {
                 style={{ tabSize: 2 }}
               >
                 {
-                  ` <uses-permission android:name="android.permission.CALL_PHONE" /> \n <uses-permission android:name="android.permission.VIBRATE" /> \n <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  \n <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />  \n <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />`
+                  ` <uses-permission android:name="android.permission.CALL_PHONE" /> \n <uses-permission android:name="android.permission.VIBRATE" /> \n <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  \n <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />  \n <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> \n <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/> \n <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />`
                 }
               </Code>
             </Text>
