@@ -704,7 +704,7 @@ open class RapidWebViewJSInterface(
      * @see downloadFileLocally
      */
     @JavascriptInterface
-    fun downloadFileLocallyAndOpen(
+    fun downloadFileLocallyAndOpenIntent(
         url: String,
         fileName: String,
         downloadLocation: String,
