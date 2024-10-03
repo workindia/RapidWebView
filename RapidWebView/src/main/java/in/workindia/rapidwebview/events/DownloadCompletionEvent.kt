@@ -9,7 +9,7 @@ import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_DO
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_DOWNLOAD_ID
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.STATUS
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.SUCCESS
-import `in`.workindia.rapidwebview.utils.LocalBroadcastActionUtility.generateJavaScriptEvent
+import `in`.workindia.rapidwebview.broadcast.BroadcastActionHandler.generateJavaScriptEvent
 
 class DownloadCompletionEvent(private val intent: Intent) : CustomJSEvent {
 

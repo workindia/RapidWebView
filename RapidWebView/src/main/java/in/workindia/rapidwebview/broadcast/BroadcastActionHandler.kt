@@ -1,79 +1,15 @@
-package `in`.workindia.rapidwebview.utils
+package `in`.workindia.rapidwebview.broadcast
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Context.RECEIVER_EXPORTED
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.webkit.WebView
-import androidx.annotation.RequiresApi
 import `in`.workindia.rapidwebview.constants.BroadcastConstants
 import `in`.workindia.rapidwebview.events.DownloadCompletionEvent
 import `in`.workindia.rapidwebview.events.PermissionResultEvent
 import `in`.workindia.rapidwebview.events.UploadCompletionEvent
 
-object LocalBroadcastActionUtility {
-
-    fun createReceiver(
-        action: String,
-        onReceive: (context: Context?, intent: Intent, receiver: BroadcastReceiver) -> Unit,
-    ): BroadcastReceiver {
-        return object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent?.action == action) {
-                    onReceive(context, intent, this)
-                }
-            }
-        }
-    }
-
-    fun registerReceiver(
-        context: Context,
-        broadcastReceiver: BroadcastReceiver,
-        intentFilter: IntentFilter,
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            registerReceiverApi34(
-                context,
-                broadcastReceiver,
-                intentFilter
-            )
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiverApi26(
-                context,
-                broadcastReceiver,
-                intentFilter
-            )
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun registerReceiverApi34(
-        context: Context,
-        broadcastReceiver: BroadcastReceiver,
-        intentFilter: IntentFilter,
-    ) {
-        context.registerReceiver(
-            broadcastReceiver,
-            intentFilter,
-            RECEIVER_EXPORTED
-        )
-    }
-
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun registerReceiverApi26(
-        context: Context,
-        broadcastReceiver: BroadcastReceiver,
-        intentFilter: IntentFilter,
-    ) {
-        context.registerReceiver(
-            broadcastReceiver,
-            intentFilter
-        )
-    }
+object BroadcastActionHandler {
 
     /**
      * Handles [BroadcastConstants.NATIVE_CALLBACK_ACTION] by dispatching the appropriate JavaScript events to the WebView.

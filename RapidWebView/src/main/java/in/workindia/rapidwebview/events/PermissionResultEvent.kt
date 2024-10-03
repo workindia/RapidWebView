@@ -7,7 +7,7 @@ import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.FAILUR
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMISSION_LIST_KEY
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.STATUS
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.SUCCESS
-import `in`.workindia.rapidwebview.utils.LocalBroadcastActionUtility.generateJavaScriptEvent
+import `in`.workindia.rapidwebview.broadcast.BroadcastActionHandler.generateJavaScriptEvent
 
 class PermissionResultEvent(private val intent: Intent) : CustomJSEvent {
 

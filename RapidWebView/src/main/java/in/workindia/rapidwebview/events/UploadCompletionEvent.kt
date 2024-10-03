@@ -8,7 +8,7 @@ import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_UP
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_UPLOAD_URL
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.STATUS
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.SUCCESS
-import `in`.workindia.rapidwebview.utils.LocalBroadcastActionUtility.generateJavaScriptEvent
+import `in`.workindia.rapidwebview.broadcast.BroadcastActionHandler.generateJavaScriptEvent
 
 class UploadCompletionEvent(private val intent: Intent) : CustomJSEvent {
 

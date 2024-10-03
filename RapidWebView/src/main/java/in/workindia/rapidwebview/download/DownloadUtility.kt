@@ -1,4 +1,4 @@
-package `in`.workindia.rapidwebview.utils
+package `in`.workindia.rapidwebview.download
 
 import android.app.DownloadManager
 import android.content.ActivityNotFoundException
@@ -11,6 +11,7 @@ import android.os.Environment
 import android.webkit.WebView
 import androidx.core.content.FileProvider
 import `in`.workindia.rapidwebview.R
+import `in`.workindia.rapidwebview.broadcast.BroadcastActionHandler
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.EVENT_DOWNLOAD_LISTENER
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.EVENT_KEY
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.FAILURE
@@ -123,7 +124,7 @@ object DownloadUtility {
                             downloadMimeType
                         )
                     } else {
-                        val downloadUnSuccessfulEvent = LocalBroadcastActionUtility.generateJavaScriptEvent(
+                        val downloadUnSuccessfulEvent = BroadcastActionHandler.generateJavaScriptEvent(
                             EVENT_DOWNLOAD_LISTENER,
                             mapOf(
                                 EVENT_KEY to KEY_DOWNLOAD_UNSUCCESSFUL,
@@ -131,7 +132,7 @@ object DownloadUtility {
                                 KEY_DETAIL to "Download with downloadId $downloadId was unsuccessful"
                             )
                         )
-                        LocalBroadcastActionUtility.dispatchJavaScript(downloadUnSuccessfulEvent, webView)
+                        BroadcastActionHandler.dispatchJavaScript(downloadUnSuccessfulEvent, webView)
                     }
                 }
             }
@@ -175,7 +176,7 @@ object DownloadUtility {
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            val activityNotFoundEvent = LocalBroadcastActionUtility.generateJavaScriptEvent(
+            val activityNotFoundEvent = BroadcastActionHandler.generateJavaScriptEvent(
                 EVENT_DOWNLOAD_LISTENER,
                 mapOf(
                     EVENT_KEY to KEY_PACKAGE_NOT_FOUND,
@@ -183,7 +184,7 @@ object DownloadUtility {
                     KEY_DETAIL to "Package not found for opening file type $attachmentMimeType"
                 )
             )
-            LocalBroadcastActionUtility.dispatchJavaScript(activityNotFoundEvent, webView)
+            BroadcastActionHandler.dispatchJavaScript(activityNotFoundEvent, webView)
         }
     }
 
