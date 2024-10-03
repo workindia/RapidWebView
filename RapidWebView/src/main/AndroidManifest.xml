@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="in.workindia.rapidwebview">
 
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application>
 
         <provider
@@ -30,7 +27,9 @@
             android:exported="false"
             android:theme="@style/Theme.Transparent.Activity" />
 
-        <service android:name="in.workindia.rapidwebview.activities.service.UploadService" />
+        <service android:name="in.workindia.rapidwebview.activities.service.UploadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

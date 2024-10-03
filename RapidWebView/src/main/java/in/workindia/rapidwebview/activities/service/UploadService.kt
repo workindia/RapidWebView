@@ -6,6 +6,7 @@ import `in`.workindia.rapidwebview.network.RetrofitHelper
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
@@ -109,7 +110,10 @@ class UploadService : Service() {
                 .setOngoing(onGoing)
                 .build()
 
-        startForeground(90, notification)
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> startForeground(90, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> startForeground(90, notification)
+        }
     }
 
     private fun uploadFilesUsingService() {

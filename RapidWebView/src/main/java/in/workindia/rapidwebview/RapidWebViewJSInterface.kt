@@ -1,15 +1,17 @@
 package `in`.workindia.rapidwebview
 
-import `in`.workindia.rapidwebview.activities.PermissionActivity
-import `in`.workindia.rapidwebview.activities.UploadFileActivity
-import `in`.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader
-import `in`.workindia.rapidwebview.assetcache.RapidStorageUtility
-import `in`.workindia.rapidwebview.constants.BroadcastConstants
 import android.Manifest
 import android.app.Activity
+import android.app.DownloadManager
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -26,6 +28,17 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import `in`.workindia.rapidwebview.activities.PermissionActivity
+import `in`.workindia.rapidwebview.activities.UploadFileActivity
+import `in`.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader
+import `in`.workindia.rapidwebview.assetcache.RapidStorageUtility
+import `in`.workindia.rapidwebview.constants.BroadcastConstants
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PERMISSION_LIST_KEY
+import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.RATIONAL_TEXT
+import `in`.workindia.rapidwebview.broadcast.BroadcastReceiverFactory
+import `in`.workindia.rapidwebview.download.DownloadUtility
+import `in`.workindia.rapidwebview.broadcast.GlobalBroadcastReceiverRegistrar
+import `in`.workindia.rapidwebview.broadcast.BroadcastActionHandler
 import org.json.JSONException
 import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
@@ -37,68 +50,46 @@ import pub.devrel.easypermissions.EasyPermissions
 open class RapidWebViewJSInterface(
     private val context: Context,
     private val activity: Activity,
-    private val webView: WebView
+    private val webView: WebView,
 ) {
 
-    /**
-     * BroadCastReceiver to update push data to the page loaded on RapidWebView. The receiver
-     * get certain events and performs actions based on event type. Data is pushed to website / page
-     * using webView.loadUrl method.
-     *
-     * Events supported:
-     * 1. File Upload success / failure
-     * 2. Permission request callback
-     *
-     */
-    private val broadcastReceiverForNativeCallbacks: BroadcastReceiver =
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent) {
-                if (intent.action == BroadcastConstants.NATIVE_CALLBACK_ACTION) {
-                    val permission = intent.getStringExtra(BroadcastConstants.PERMISSION)
-                    val uploadUrl = intent.getStringExtra(BroadcastConstants.UPLOADED_URL) ?: ""
-                    val fileName =
-                        intent.getStringExtra(BroadcastConstants.UPLOADED_FILE_NAME) ?: ""
-                    var javaScript = ""
-                    when {
-                        intent.getStringExtra(BroadcastConstants.UPLOAD)
-                            ?.equals(BroadcastConstants.SUCCESS) == true -> {
-
-                            javaScript =
-                                "window.dispatchEvent(new CustomEvent('rapid-web-view-upload-listener', { detail: { 'status' : \"success\",'uploadUrl' : '$uploadUrl','uploadFileName' : '$fileName' } }))"
-                        }
-                        intent.getStringExtra(BroadcastConstants.UPLOAD)
-                            ?.equals(BroadcastConstants.FAILURE) == true -> {
-                            javaScript =
-                                "window.dispatchEvent(new CustomEvent('rapid-web-view-upload-listener', { detail: { 'status' : \"failure\" } }))"
-                        }
-                        intent.getStringExtra(BroadcastConstants.PERMISSION)
-                            ?.equals(BroadcastConstants.SUCCESS) == true -> {
-                            javaScript =
-                                "window.dispatchEvent(new CustomEvent('rapid-web-view-permission-listener', { detail: { 'status' : \"success\",'permissionList' : '${permission.toString()}' } }))"
-                        }
-                        intent.getStringExtra(BroadcastConstants.PERMISSION)
-                            ?.equals(BroadcastConstants.FAILURE) == true -> {
-                            javaScript =
-                                "window.dispatchEvent(new CustomEvent('rapid-web-view-permission-listener', { detail: { 'status' : \"failure\" } }))"
-                        }
-                    }
-                    webView.post {
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                            webView.evaluateJavascript(javaScript, null);
-                        } else {
-                            webView.loadUrl("javascript:(function(){$javaScript})()");
-                        }
-                    }
-                }
-            }
-        }
 
     init {
         val bManager = LocalBroadcastManager.getInstance(context)
         val intentFilter = IntentFilter()
         intentFilter.addAction(BroadcastConstants.NATIVE_CALLBACK_ACTION)
+
+        /**
+         * BroadCastReceiver to update push data to the page loaded on RapidWebView. The receiver
+         * get certain events and performs actions based on event type. Data is pushed to website / page
+         * using webView.loadUrl method.
+         *
+         * Events supported:
+         * 1. File Upload success / failure
+         * 2. Permission request callback
+         *
+         */
+        val broadcastReceiverForNativeCallbacks: BroadcastReceiver =
+            BroadcastReceiverFactory.createReceiver(BroadcastConstants.NATIVE_CALLBACK_ACTION) { _, intent, _ ->
+                BroadcastActionHandler.handleNativeCallbackAction(webView, intent)
+            }
+
         bManager.registerReceiver(broadcastReceiverForNativeCallbacks, intentFilter)
+
+        val downloadCompletionReceiver: BroadcastReceiver =
+            BroadcastReceiverFactory.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, _ ->
+                BroadcastActionHandler.dispatchDownloadCompletionEvent(webView, intent)
+            }
+
+        GlobalBroadcastReceiverRegistrar.registerReceiver(
+            context,
+            downloadCompletionReceiver,
+            IntentFilter().apply {
+                addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+            }
+        )
     }
+
 
     /**
      * Start any activity within the application
@@ -124,9 +115,11 @@ open class RapidWebViewJSInterface(
                     value is Int -> {
                         intent.putExtra(key, value)
                     }
+
                     value is String -> {
                         intent.putExtra(key, value)
                     }
+
                     value is Boolean -> {
                         intent.putExtra(key, value)
                     }
@@ -194,6 +187,7 @@ open class RapidWebViewJSInterface(
      * Vibrate device
      * @param durationMs: vibrate duration in milliseconds
      */
+    @Suppress("MissingPermission")
     @JavascriptInterface
     fun vibrate(durationMs: Long = 500) {
         val vibrator = context
@@ -486,8 +480,8 @@ open class RapidWebViewJSInterface(
     fun requestPermissions(permissions: Array<String>, rationaleText: String) {
         val intent = Intent(activity, PermissionActivity::class.java)
 
-        intent.putExtra("permissionList", permissions)
-        intent.putExtra("rationalText", rationaleText)
+        intent.putExtra(PERMISSION_LIST_KEY, permissions)
+        intent.putExtra(RATIONAL_TEXT, rationaleText)
 
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
@@ -534,6 +528,17 @@ open class RapidWebViewJSInterface(
         return RapidStorageUtility.cacheExists(fileUrl)
     }
 
+    /**
+     * Displays a notification to the user. Requires [Manifest.permission.POST_NOTIFICATIONS] from [Build.VERSION_CODES.TIRAMISU].
+     * The caller must ensure that the appropriate permissions are present before calling this method
+     *
+     * @param title Title of the notification.
+     * @param contentText The content text of the notification.
+     * @param summaryText Summary text for the notification (optional).
+     * @param notificationIcon Resource name of the image used as the notification icon.
+     * @param notificationImage Resource name of the image used in the expanded notification.
+     * @param destActivity Name of the activity to navigate to when the notification is clicked.
+     */
     @JavascriptInterface
     fun showNotification(
         title: String,
@@ -541,9 +546,8 @@ open class RapidWebViewJSInterface(
         summaryText: String?,
         notificationIcon: String,
         notificationImage: String,
-        destActivity: String
+        destActivity: String,
     ) {
-
         val mBuilder = NotificationCompat.Builder(
             context.applicationContext,
             RapidWebViewNotificationHelper.getChannelId(
@@ -620,5 +624,107 @@ open class RapidWebViewJSInterface(
         activity.finish()
     }
 
+    /**
+     * Get current Android SDK version
+     */
+    @JavascriptInterface
+    fun getAndroidSDKVersion(): Int {
+        return Build.VERSION.SDK_INT
+    }
 
+    /**
+     * Downloads a file from the given URL to a specified local directory.
+     *
+     * This method downloads a file from the provided `url` and saves it locally with the given `fileName`
+     * in the specified `downloadLocation`.
+     * In addition, the method fires a JavaScript event to notify the WebView of the download status.
+     *
+     * **Event Dispatch:**
+     * - On download completion, fires a `rapid-web-view-download-listener` event with the payload:
+     *     `{ detail: { eventKey: "downloadCompleted", status: "success|failure", downloadId: "downloadId" } }`
+     *
+     * **Note:**
+     * - Requires [Manifest.permission.WRITE_EXTERNAL_STORAGE] permission on devices running Android 9 (Pie, API 28) or lower for downloading to public storage directories.
+     *
+     * @param url The URL of the file to be downloaded.
+     *     - **Expected format:** A valid URL (e.g., https://example.com/sample.pdf).
+     *
+     * @param fileName The name of the file to be saved locally after download, including the file extension.
+     *     - **Example:** "example-file.pdf".
+     *     - **Default behavior:** If not provided, the last segment of the URL will be used as the file name.
+     *     - **Note:** Ensure that the provided file name includes the appropriate MIME type (e.g., `.pdf`, `.png`, etc.).
+     *
+     * @param downloadLocation The location where the file will be saved on the device.
+     *     - **Accepted values:**
+     *         - `"PUBLIC_DOWNLOADS"`: The file will be saved in the system's public Downloads directory.
+     *         - `"EXTERNAL_FILES"`: The file will be saved in the app's external files directory (specific to the app).
+     *     - **Default behavior:** If not provided, `"PUBLIC_DOWNLOADS"` is chosen.
+     *
+     */
+    @JavascriptInterface
+    fun downloadFileLocally(
+        url: String,
+        fileName: String,
+        downloadLocation: String
+    ) {
+        val downloadLocationEnum = DownloadUtility.toDownloadLocation(downloadLocation)
+        DownloadUtility.startDownload(context, url, fileName, downloadLocationEnum)
+    }
+
+    /**
+     * Downloads a file from the given URL and opens it upon completion.
+     *
+     * This method downloads the file using [downloadFileLocally],
+     * and automatically opens it once the download is complete. A global broadcast receiver listens for the
+     * `DownloadManager.ACTION_DOWNLOAD_COMPLETE` broadcast and triggers the file opening action.
+     *  In addition, the method fires a JavaScript event to notify the WebView of the download status.
+     *
+     * **Event Dispatch:**
+     * - On download completion, fires a `rapid-web-view-download-listener` event with the payload:
+     *     `{ detail: { eventKey: "downloadCompleted|downloadUnSuccessful|packageNotFound", status: "success|failure", downloadId: "downloadId" } }`
+     *
+     * **Note:**
+     * - Requires Android 8.0 (API level 26) or higher to open the downloaded file.
+     * - For Android versions before API 26, the file will be downloaded, but the automatic opening functionality will not work.
+     * - This method uses a global broadcast receiver to handle the download completion action and unregisters the receiver afterward.
+     * - Requires [Manifest.permission.WRITE_EXTERNAL_STORAGE] permission on devices running Android 9 (Pie, API 28) or lower for downloading to public storage directories.
+     * - Requires [Manifest.permission.READ_EXTERNAL_STORAGE] permission on devices running Android 9 (Pie, API 28) or lower for opening the downloaded file.
+     *
+     * @param url The URL of the file to be downloaded.
+     *     - **Expected format:** A valid URL (e.g., https://example.com/sample.pdf).
+     *
+     * @param fileName The name of the file to be saved locally after download, including the file extension.
+     *     - **Example:** "example-file.pdf".
+     *     - **Default behavior:** If not provided, the last segment of the URL will be used as the file name.
+     *     - **Note:** Ensure that the provided file name includes the appropriate MIME type (e.g., `.pdf`, `.png`, etc.).
+     *
+     * @param downloadLocation The location where the file will be saved on the device.
+     *     - **Accepted values:**
+     *         - `"PUBLIC_DOWNLOADS"`: The file will be saved in the system's public Downloads directory.
+     *         - `"EXTERNAL_FILES"`: The file will be saved in the app's external files directory (specific to the app).
+     *     - **Default behavior:** If not provided, `"PUBLIC_DOWNLOADS"` is chosen.
+     *
+     * @see downloadFileLocally
+     */
+    @JavascriptInterface
+    fun downloadFileLocallyAndOpenIntent(
+        url: String,
+        fileName: String,
+        downloadLocation: String,
+    ) {
+        val openFileReceiver =
+            BroadcastReceiverFactory.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, receiver ->
+                val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
+                if (downloadId != -1L) {
+                    DownloadUtility.openFileFromDownloads(context, webView, downloadId)
+                }
+                context.unregisterReceiver(receiver)
+            }
+
+        GlobalBroadcastReceiverRegistrar.registerReceiver(context, openFileReceiver, IntentFilter().apply {
+            addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        })
+
+        downloadFileLocally(url, fileName, downloadLocation)
+    }
 }
