@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [1.3.0] - 2024-10-03
+### Added
+- Upgraded library to API 34
+- Added downloadFileLocally & downloadFileLocallyAndOpenIntent Functionality to RapidWebViewJSInterface
+
+### Changed
+- Updated the ShowNotification function to handle "POST_NOTIFICATIONS" permission on Android 13.0+ devices
+- Updated uploadFile function to handle Media Permissions on Android 13.0+ devices and updated corresponding function signatures 
+- Removed a few default permission declaration from library manifest
+- Updated documentation site according to the changes made
+
 ## [1.2.1] - 2022-11-11
 ### Fixed
 - CrashFix
