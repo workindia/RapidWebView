@@ -72,8 +72,7 @@ This guide will help you set up the **RapidWebView** project locally to test and
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/workindia/rapidwebview.git
-cd rapidwebview
+git clone https://github.com/workindia/RapidWebView.git
 ```
 
 ---
@@ -101,20 +100,16 @@ This includes the sample app module in the build.
 
 ### 4. Update Sample App Dependencies
 
-In the `build.gradle` (or `build.gradle.kts`) file of the sample app module:
+In the  ./samples/RapidWebViewAndroidSample/app/build.gradle `build.gradle` file of the sample app module:
 
-#### ✅ Add this line to the dependencies block:
-
-```groovy
-implementation project(':RapidWebView')
-```
-
-#### ❌ Comment out the existing GitHub dependency:
-
+##### ❌ Comment out the existing GitHub dependency:
 ```groovy
 // implementation 'com.github.workindia:rapidwebview:1.3.0'
 ```
-
+##### ✅ Add this line to the dependencies block:
+```groovy
+implementation project(':RapidWebView')
+```
 This ensures the app uses the local version of the library for development and testing.
 
 ---
@@ -126,7 +121,7 @@ This ensures the app uses the local version of the library for development and t
 - If needed, update the documentation demo site code:
 
   ```tsx
-  docs-site/pages/js-demo.tsx
+  samples/RapidWebViewSdkDocsSite/pages/examples/js-demo.tsx
   ```
 
 - Run the sample app from Android Studio to see your changes reflected.
