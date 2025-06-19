@@ -44,8 +44,6 @@ import `in`.workindia.rapidwebview.datamodels.DownloadStatus
 import org.json.JSONException
 import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
-import java.util.stream.Stream
-
 
 /**
  * Javascript interface with few pre-made general interface function
@@ -749,7 +747,7 @@ open class RapidWebViewJSInterface(
     }
 
     @JavascriptInterface
-    fun getDownloadStatus(context: Context, downloadId: Long): String {
+    fun getDownloadStatus(downloadId: Long): String {
         val downloadStatus: DownloadStatus = DownloadUtility.getDownloadStatus(context, downloadId)
         return Gson().toJson(downloadStatus)
     }
