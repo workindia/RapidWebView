@@ -21,6 +21,7 @@ import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.KEY_PA
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.PROVIDER_SUFFIX
 import `in`.workindia.rapidwebview.constants.BroadcastConstants.Companion.STATUS
 import `in`.workindia.rapidwebview.datamodels.DownloadLocation
+import `in`.workindia.rapidwebview.datamodels.DownloadStatus
 import java.io.File
 
 object DownloadUtility {
@@ -208,6 +209,58 @@ object DownloadUtility {
             DownloadLocation.valueOf(location)
         } catch (e: IllegalArgumentException) {
             DownloadLocation.PUBLIC_DOWNLOADS
+        }
+    }
+
+    /**
+     * Downloads a file from the given URL to a specified local directory.
+     * Similar to startDownload() function.
+     * Key difference is that this function returns a downloadId
+     */
+    fun startDownloadWithId(
+        context: Context,
+        url: String,
+        fileName: String? = null,
+        downloadLocation: DownloadLocation = DownloadLocation.PUBLIC_DOWNLOADS,
+    ): Long? {
+        return try {
+            val uri = Uri.parse(url)
+            val request = DownloadManager.Request(uri)
+            val validFileName = getFileNameFromUri(fileName, uri)
+            request.setTitle(validFileName)
+            request.setDescription(context.resources.getString(R.string.downloading_file))
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+            setDownloadDestination(context, request, downloadLocation, validFileName)
+            val downloadManager =
+                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+        } catch (exception: Exception) {
+            null // Return null in case of failure
+        }
+    }
+
+    fun getDownloadStatus(context: Context, downloadId: Long): DownloadStatus {
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val query = DownloadManager.Query().setFilterById(downloadId)
+        val cursor = downloadManager.query(query)
+        if (cursor != null && cursor.moveToFirst()) {
+            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+            val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
+            val bytesDownloaded =
+                cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+            val totalBytes =
+                cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+            cursor.close()
+            return DownloadStatus(status, reason, bytesDownloaded, totalBytes)
+        } else {
+            cursor?.close()
+            return DownloadStatus(
+                status = DownloadManager.STATUS_FAILED,
+                reason = DownloadManager.ERROR_UNKNOWN,
+                bytesDownloaded = 0,
+                totalBytes = -1
+            )
         }
     }
 }

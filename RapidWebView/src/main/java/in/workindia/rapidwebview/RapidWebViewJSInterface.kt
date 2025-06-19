@@ -28,6 +28,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.gson.Gson
 import `in`.workindia.rapidwebview.activities.PermissionActivity
 import `in`.workindia.rapidwebview.activities.UploadFileActivity
 import `in`.workindia.rapidwebview.assetcache.RapidAssetCacheDownloader
@@ -39,9 +40,11 @@ import `in`.workindia.rapidwebview.broadcast.BroadcastReceiverFactory
 import `in`.workindia.rapidwebview.download.DownloadUtility
 import `in`.workindia.rapidwebview.broadcast.GlobalBroadcastReceiverRegistrar
 import `in`.workindia.rapidwebview.broadcast.BroadcastActionHandler
+import `in`.workindia.rapidwebview.datamodels.DownloadStatus
 import org.json.JSONException
 import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
+import java.util.stream.Stream
 
 
 /**
@@ -726,5 +729,28 @@ open class RapidWebViewJSInterface(
         })
 
         downloadFileLocally(url, fileName, downloadLocation)
+    }
+
+    /**
+     * Downloads a file from the given URL to a specified local directory.
+     * This function is similar to downloadFileLocally()
+     * Key difference is that this function returns downloadId
+     **/
+    @JavascriptInterface
+    fun downloadFileLocallyWithId(
+        url: String,
+        fileName: String,
+        downloadLocation: String
+    ): Long? {
+        val downloadLocationEnum = DownloadUtility.toDownloadLocation(downloadLocation)
+        return DownloadUtility.startDownloadWithId(
+            context, url, fileName, downloadLocationEnum
+        )
+    }
+
+    @JavascriptInterface
+    fun getDownloadStatus(context: Context, downloadId: Long): String {
+        val downloadStatus: DownloadStatus = DownloadUtility.getDownloadStatus(context, downloadId)
+        return Gson().toJson(downloadStatus)
     }
 }
