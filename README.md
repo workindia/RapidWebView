@@ -54,3 +54,82 @@ Follow the guide [here](https://rapid-web-view.netlify.app/docs/getting-started)
 
 We're looking to improve this project, open source contribution is encouraged. WorkIndia team will be reviewing the pull requests.  
 [Pull requests](https://github.com/workindia/RapidWebView/pulls)
+
+# RapidWebView – Local Development Setup
+
+This guide will help you set up the **RapidWebView** project locally to test and modify the library alongside the sample app.
+
+## 📦 Prerequisites
+
+- Android Studio **Koala** or later
+- Git
+- Node.js (for documentation/demo site updates)
+
+---
+
+## 🛠️ Steps to Set Up
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/workindia/RapidWebView.git
+```
+
+---
+
+### 2. Sync Dependencies
+
+Open the project in **Android Studio Koala**. Ensure the Gradle version is compatible with this Android Studio version.
+
+Use the **Gradle Wrapper** or upgrade the Gradle version if prompted by Android Studio.
+
+---
+
+### 3. Link the Sample App
+
+Edit the `settings.gradle` file in the root directory and add the following:
+
+```groovy
+include ':app'
+project(':app').projectDir = new File('./samples/RapidWebViewAndroidSample/app')
+```
+
+This includes the sample app module in the build.
+
+---
+
+### 4. Update Sample App Dependencies
+
+In the  ./samples/RapidWebViewAndroidSample/app/build.gradle `build.gradle` file of the sample app module:
+
+##### ❌ Comment out the existing GitHub dependency:
+```groovy
+// implementation 'com.github.workindia:rapidwebview:1.3.0'
+```
+##### ✅ Add this line to the dependencies block:
+```groovy
+implementation project(':RapidWebView')
+```
+This ensures the app uses the local version of the library for development and testing.
+
+---
+
+### 5. Modify & Test
+
+- Make your changes in the `RapidWebView` library code.
+
+- If needed, update the documentation demo site code:
+
+  ```tsx
+  samples/RapidWebViewSdkDocsSite/pages/examples/js-demo.tsx
+  ```
+
+- Run the sample app from Android Studio to see your changes reflected.
+
+---
+
+## ✅ You're All Set!
+
+You're now ready to develop and test the `RapidWebView` library locally using the sample app.
+
+Happy coding!
