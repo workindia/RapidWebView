@@ -1,6 +1,7 @@
 package `in`.workindia.rapidwebview.broadcast
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.webkit.WebView
@@ -50,8 +51,8 @@ object BroadcastActionHandler {
      * @param webView The WebView to which the JavaScript will be dispatched.
      * @param intent The intent received from BrodCastReceiver.
      */
-    fun dispatchDownloadCompletionEvent(webView: WebView, intent: Intent) {
-        val action = DownloadCompletionEvent(intent)
+    fun dispatchDownloadCompletionEvent(context: Context, webView: WebView, intent: Intent) {
+        val action = DownloadCompletionEvent(context, intent)
         val javaScript = action.generateJavaScript()
         dispatchJavaScript(javaScript, webView)
     }
