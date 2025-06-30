@@ -78,7 +78,7 @@ open class RapidWebViewJSInterface(
 
         val downloadCompletionReceiver: BroadcastReceiver =
             BroadcastReceiverFactory.createReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { _, intent, _ ->
-                BroadcastActionHandler.dispatchDownloadCompletionEvent(webView, intent)
+                BroadcastActionHandler.dispatchDownloadCompletionEvent(context, webView, intent)
             }
 
         GlobalBroadcastReceiverRegistrar.registerReceiver(
