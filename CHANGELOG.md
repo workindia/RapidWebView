@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
-## [1.4.0] - 2025-06-20
+## [2.0.0] - 2025-06-30
 ### Changed
 - Updated the DownloadCompletionEvent to fire an event with the status set to Failure if the download fails.
 - dispatchDownloadCompletionEvent now uses a modified function signature that is not backward compatible.
