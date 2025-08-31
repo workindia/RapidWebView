@@ -218,7 +218,7 @@ class UploadFileBottomSheet : BottomSheetDialogFragment(), HandlePathOzListener.
     }
 
     override fun onRequestHandlePathOz(pathOz: PathOz, tr: Throwable?) {
-        if (!pathOz.path?.equals("")) {
+        if (pathOz.path.isNotEmpty()) {
             view?.findViewById<Group>(R.id.file_present)?.visibility = View.VISIBLE
             view?.findViewById<Group>(R.id.file_absent)?.visibility = View.GONE
             fileName = File(pathOz?.path)?.name ?: ""
