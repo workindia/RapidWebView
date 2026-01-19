@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.layoutRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             
             view.updatePadding(bottom = systemBars.bottom)
