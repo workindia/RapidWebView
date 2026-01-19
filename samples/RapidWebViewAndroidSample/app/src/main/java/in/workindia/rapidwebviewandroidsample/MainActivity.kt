@@ -19,33 +19,26 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // MANDATORY for Android 15 - Enable Edge-to-Edge
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
         
-        // Modern View Binding approach
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Set up the custom toolbar as action bar
         setSupportActionBar(binding.toolbar)
         
-        // Handle window insets to extend toolbar into status bar
         ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { toolbar, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             
-            // Add top padding to toolbar to account for status bar height
             toolbar.updatePadding(top = systemBars.top)
             
             insets
         }
         
-        // Handle insets for the main content area
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             
-            // Only apply bottom padding for navigation bar
             view.updatePadding(bottom = systemBars.bottom)
             
             insets
