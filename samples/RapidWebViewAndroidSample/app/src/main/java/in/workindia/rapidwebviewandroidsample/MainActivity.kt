@@ -44,15 +44,10 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        try {
-            RapidAssetCacheDownloader.initialise(
-                "https://rapid-web-view.netlify.app/_next/static/assets-manifest.json",
-                2
-            )
-        } catch (e: Exception) {
-            TODO("Not yet implemented")
-        } finally {
-        }
+        RapidAssetCacheDownloader.initialise(
+            "https://rapid-web-view.netlify.app/_next/static/assets-manifest.json",
+            2
+        )
 
         binding.navigationButton.setOnClickListener {
             startActivity(Intent(this, WebViewActivity::class.java))
