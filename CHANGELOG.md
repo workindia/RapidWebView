@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.1.0] - 2026-01-20
+### Added
+- Compatibility for Android 15
+- Latest build tools and dependencies
+- Edge-to-edge display requirements
+
+### Breaking Changes
+- Minimum Java version requirement increased to Java 11
+- Requires Android Gradle Plugin 8.8.0 or higher
+- ViewBinding migration may require updates in consuming applications
+
 ## [2.0.0] - 2025-06-30
 ### Changed
 - Updated the DownloadCompletionEvent to fire an event with the status set to Failure if the download fails.
