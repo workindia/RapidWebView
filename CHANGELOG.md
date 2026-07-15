@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
-## [Unreleased]
+## [2.1.1] - 2026-07-15
 ### Changed
 - Made `RapidWebViewClient` an open class so that it can be subclassed by consuming apps (eg: to override `shouldOverrideUrlLoading` for deep-link / payment SDK handling) while still inheriting the asset-cache interception in `shouldInterceptRequest`.
 
