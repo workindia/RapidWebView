@@ -1,5 +1,6 @@
 package `in`.workindia.rapidwebviewandroidsample
 
+import `in`.workindia.rapidwebview.RapidWebChromeClient
 import `in`.workindia.rapidwebview.RapidWebViewClient
 import `in`.workindia.rapidwebview.RapidWebViewJSInterface
 import android.annotation.SuppressLint
@@ -72,6 +73,8 @@ class WebViewActivity : AppCompatActivity() {
 
         val rapidWebViewClient = RapidWebViewClient()
         binding.rapidWebView.webViewClient = rapidWebViewClient
+        binding.rapidWebView.webChromeClient =
+            RapidWebChromeClient(this, listOf("rapid-web-view.netlify.app"))
 
         binding.rapidWebView.addJavascriptInterface(
             RapidWebViewJSInterface(this, this, binding.rapidWebView),

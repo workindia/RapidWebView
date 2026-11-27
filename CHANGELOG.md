@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.2.0] - 2026-11-27
+### Added
+- `RapidWebChromeClient`: lets trusted pages record audio with `getUserMedia`. It grants the mic only when the app has `RECORD_AUDIO` and the page host is in the trusted host list passed by the app. Open class, so apps can extend it and keep their own callbacks.
+- `RECORD_AUDIO` and `MODIFY_AUDIO_SETTINGS` permissions in the library manifest.
+
 ## [2.1.1] - 2026-07-15
 ### Changed
 - Made `RapidWebViewClient` an open class so that it can be subclassed by consuming apps (eg: to override `shouldOverrideUrlLoading` for deep-link / payment SDK handling) while still inheriting the asset-cache interception in `shouldInterceptRequest`.

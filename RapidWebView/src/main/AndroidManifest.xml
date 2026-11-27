@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="in.workindia.rapidwebview">
 
+    <!-- Needed by RapidWebChromeClient so pages can record audio with getUserMedia -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
     <application>
 
         <provider
